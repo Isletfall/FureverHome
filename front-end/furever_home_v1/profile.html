@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>个人主页 - FUREVERHOME</title>
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: { primary: '#fd7e14', 'background-light': '#f8f9fa', 'background-dark': '#121212' },
+            fontFamily: { sans: ['"Noto Sans SC"', 'sans-serif'] },
+            borderRadius: { DEFAULT: '0.5rem' }
+          }
+        }
+      };
+    </script>
+    <style>body { font-family: 'Noto Sans SC', sans-serif; }</style>
+  </head>
+  <body class="bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200">
+    <!-- 保留页面原有导航结构，用于视觉一致性，可按需删除 -->
+    <header class="bg-primary shadow-md sticky top-0 z-50">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center">
+            <span class="material-icons text-white text-3xl mr-2">pets</span>
+            <span class="text-white text-xl font-bold tracking-wider">FUREVERHOME</span>
+          </div>
+          <nav class="hidden md:flex items-center space-x-8 text-white">
+            <a href="/index.html" class="hover:text-gray-200">首页</a>
+            <a href="#" class="hover:text-gray-200">宠物详情</a>
+            <a href="#" class="hover:text-gray-200">沟通对接</a>
+            <a href="#" class="hover:text-gray-200">宠物论坛</a>
+            <a href="#" class="font-bold border-b-2 border-white pb-1">个人主页</a>
+          </nav>
+          <div class="flex items-center">
+            <button class="bg-white/20 rounded-full p-2 hover:bg-white/30" aria-label="用户">
+              <span class="material-icons text-white">person</span>
+            </button>
+            <span class="text-white ml-2 hidden sm:inline">用户</span>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <aside class="lg:col-span-1 space-y-8">
+          <div class="bg-orange-50 dark:bg-gray-800 p-6 rounded-lg shadow">
+            <div class="flex items-center space-x-4">
+              <div class="w-20 h-20 rounded-full bg-yellow-400 flex items-center justify-center text-white text-4xl font-bold">李</div>
+              <div>
+                <h1 class="text-xl font-bold text-gray-900 dark:text-white">李同学</h1>
+                <span class="inline-block bg-primary text-white text-xs font-semibold px-3 py-1 rounded-full mt-2">爱心铲屎官</span>
+              </div>
+            </div>
+            <a href="#" class="inline-flex items-center text-sm text-primary dark:text-orange-300 font-semibold mt-6 hover:underline">
+              <span class="material-icons text-base mr-1">arrow_back_ios_new</span>
+              返回个人中心
+            </a>
+            <div class="grid grid-cols-2 gap-4 mt-4">
+              <div class="bg-white dark:bg-gray-700 p-4 rounded-lg text-center shadow-sm">
+                <p class="text-3xl font-bold text-primary">96</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">帮助次数</p>
+              </div>
+              <div class="bg-white dark:bg-gray-700 p-4 rounded-lg text-center shadow-sm">
+                <p class="text-3xl font-bold text-primary">5</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">救助宠物</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-orange-50 dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h2 class="text-lg font-bold text-primary mb-4">基本信息</h2>
+            <div class="grid grid-cols-2 gap-y-4 text-sm">
+              <div>
+                <p class="text-gray-500 dark:text-gray-400">所在地区</p>
+                <p class="font-medium text-gray-800 dark:text-gray-200 mt-1">大学城校区</p>
+              </div>
+              <div>
+                <p class="text-gray-500 dark:text-gray-400">注册时间</p>
+                <p class="font-medium text-gray-800 dark:text-gray-200 mt-1">2023年3月</p>
+              </div>
+              <div class="col-span-2">
+                <p class="text-gray-500 dark:text-gray-400">救助经验</p>
+                <p class="font-medium text-gray-800 dark:text-gray-200 mt-1">2年</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-orange-50 dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h2 class="text-lg font-bold text-primary mb-4">我的勋章</h2>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">勋章 1</div>
+              <div class="aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">勋章 2</div>
+              <div class="aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">勋章 3</div>
+            </div>
+          </div>
+        </aside>
+        <div class="lg:col-span-2 space-y-8">
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h2 class="text-lg font-bold text-primary mb-4">个人简介</h2>
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed">大家好！我是一名大学生，也是一名热爱动物的志愿者。我致力于校园流浪动物的救助与临时寄养，希望成为这些小生命寻找温暖的家。有3年养宠经验，有护宠证书，有爱心有耐心。</p>
+          </div>
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-lg font-bold text-primary">爱宠证明档案</h2>
+            </div>
+            <h3 class="font-semibold text-gray-700 dark:text-gray-200 mb-2">养宠经历</h3>
+            <ul class="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-300 mb-6">
+              <li>2021-2023年 饲养金毛犬“旺财” - 负责任照顾，包括日常护理、定期带去宠物医院体检</li>
+              <li>2020-至今 救助并寄养校园流浪猫狗 - 跨校区协作，协助它们寻找合适的领养家庭</li>
+            </ul>
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="font-semibold text-gray-700 dark:text-gray-200">证明材料</h3>
+              <button class="text-sm bg-primary/10 text-primary dark:bg-primary/20 dark:text-orange-300 px-3 py-1 rounded-md hover:bg-primary/20 transition-colors">上传新证明</button>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <div class="relative">
+                <div class="aspect-video bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">护宠证书照片</div>
+                <span class="absolute top-2 right-2 text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 px-2 py-0.5 rounded-full">[已认证]</span>
+              </div>
+              <div class="relative">
+                <div class="aspect-video bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">宠物饲养保证书</div>
+                <span class="absolute top-2 right-2 text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded-full">[审核中]</span>
+              </div>
+              <div class="relative cursor-pointer" onclick="alert('拒绝理由：照片模糊不清，请重新上传清晰的证书照片。\n您可以点击“重新提交”按钮再次上传。')">
+                <div class="aspect-video bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">动物救助服务证书</div>
+                <span class="absolute top-2 right-2 text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 px-2 py-0.5 rounded-full">[已拒绝]</span>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h2 class="text-lg font-bold text-primary mb-4">信誉积分</h2>
+            <div class="flex items-center mb-6">
+              <span class="text-5xl font-bold text-gray-800 dark:text-gray-100">4.9</span>
+              <div class="ml-4">
+                <div class="flex text-yellow-400">
+                  <span class="material-icons">star</span><span class="material-icons">star</span><span class="material-icons">star</span><span class="material-icons">star</span><span class="material-icons">star_half</span>
+                </div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">基于28条评价</p>
+              </div>
+            </div>
+            <h3 class="font-semibold text-gray-700 dark:text-gray-200 mb-4">他人评价</h3>
+            <div class="space-y-6">
+              <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="font-semibold text-gray-800 dark:text-gray-200">张同学</p>
+                    <div class="flex text-yellow-400 my-1">
+                      <span class="material-icons text-sm">star</span><span class="material-icons text-sm">star</span><span class="material-icons text-sm">star</span><span class="material-icons text-sm">star</span><span class="material-icons text-sm">star</span>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300">李同学非常有爱心，对小橘照顾得无微不至，定期分享小橘的成长动态，让我们很放心。</p>
+                  </div>
+                  <p class="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0 ml-4">2023-10-15</p>
+                </div>
+              </div>
+              <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="font-semibold text-gray-800 dark:text-gray-200">王老师</p>
+                    <div class="flex text-yellow-400 my-1">
+                      <span class="material-icons text-sm">star</span><span class="material-icons text-sm">star</span><span class="material-icons text-sm">star</span><span class="material-icons text-sm">star</span><span class="material-icons text-sm">star_border</span>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300">感谢李同学救助了校园里的流浪猫，并帮助它们找到了温暖的家，非常有责任心。</p>
+                  </div>
+                  <p class="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0 ml-4">2023-09-28</p>
+                </div>
+              </div>
+              <div class="border-b border-gray-200 dark:border-gray-700 pb-4">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="font-semibold text-gray-800 dark:text-gray-200">匿名用户</p>
+                    <div class="flex text-yellow-400 my-1">
+                      <span class="material-icons text-sm">star</span><span class="material-icons text-sm">star</span><span class="material-icons text-sm">star_border</span><span class="material-icons text-sm">star_border</span><span class="material-icons text-sm">star_border</span>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300">沟通不是很及时，希望改进。</p>
+                  </div>
+                  <div class="flex flex-col items-end flex-shrink-0 ml-4">
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mb-2">2023-09-10</p>
+                    <button class="text-xs text-blue-600 dark:text-blue-400 hover:underline" type="button">【申诉】</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button class="mt-6 w-full sm:w-auto bg-primary text-white font-semibold py-2 px-6 rounded-lg hover:opacity-90 transition-opacity">添加评价</button>
+          </div>
+          <div class="space-y-8">
+            <div>
+              <h2 class="text-lg font-bold text-primary mb-4">短期领养</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+                  <div class="relative">
+                    <div class="bg-orange-200 dark:bg-orange-900/50 h-40 flex items-center justify-center text-orange-500 dark:text-orange-400">小橘的照片</div>
+                    <span class="absolute top-2 left-2 text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 px-2 py-0.5 rounded-full">[已通过]</span>
+                  </div>
+                  <div class="p-4">
+                    <h3 class="text-xl font-bold text-orange-500">小橘</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">橘猫 · 9个月</p>
+                    <div class="flex justify-between mt-3 text-sm">
+                      <div><p class="text-gray-400 dark:text-gray-500">性别</p><p class="font-medium text-gray-700 dark:text-gray-300">公</p></div>
+                      <div><p class="text-gray-400 dark:text-gray-500">状态</p><p class="font-medium text-green-500">健康</p></div>
+                    </div>
+                  </div>
+                  <div class="bg-orange-50 dark:bg-gray-700/50 text-center py-2 text-sm text-orange-700 dark:text-orange-300 font-medium">已短期领养 45 天</div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+                  <div class="relative">
+                    <div class="bg-blue-100 dark:bg-blue-900/50 h-40 flex items-center justify-center text-blue-500 dark:text-blue-400">小白的照片</div>
+                    <span class="absolute top-2 left-2 text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded-full">[审核中]</span>
+                  </div>
+                  <div class="p-4">
+                    <h3 class="text-xl font-bold text-blue-500">小白</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">比熊犬 · 1岁</p>
+                    <div class="flex justify-between mt-3 text-sm">
+                      <div><p class="text-gray-400 dark:text-gray-500">性别</p><p class="font-medium text-gray-700 dark:text-gray-300">母</p></div>
+                      <div><p class="text-gray-400 dark:text-gray-500">状态</p><p class="font-medium text-green-500">健康</p></div>
+                    </div>
+                  </div>
+                  <div class="bg-blue-50 dark:bg-gray-700/50 text-center py-2 text-sm text-blue-700 dark:text-blue-300 font-medium">已短期领养 12 天</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-primary mb-4">长期领养</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+                  <div class="relative">
+                    <div class="bg-pink-100 dark:bg-pink-900/50 h-40 flex items-center justify-center text-pink-500 dark:text-pink-400">花花的照片</div>
+                    <span class="absolute top-2 left-2 text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 px-2 py-0.5 rounded-full cursor-pointer" onclick="alert('拒绝理由：信息不完整，缺少疫苗记录。\n您可以点击“重新提交”按钮再次上传。')">[已拒绝]</span>
+                  </div>
+                  <div class="p-4">
+                    <h3 class="text-xl font-bold text-pink-500">花花</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">三花猫 · 2岁</p>
+                    <div class="flex justify-between mt-3 text-sm">
+                      <div><p class="text-gray-400 dark:text-gray-500">性别</p><p class="font-medium text-gray-700 dark:text-gray-300">母</p></div>
+                      <div><p class="text-gray-400 dark:text-gray-500">状态</p><p class="font-medium text-green-500">健康</p></div>
+                    </div>
+                  </div>
+                  <div class="bg-pink-50 dark:bg-gray-700/50 text-center py-2 text-sm text-pink-700 dark:text-pink-300 font-medium">已长期领养 120 天</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h2 class="text-lg font-bold text-primary mb-4">最近发布的帖子</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div class="border border-gray-200 dark:border-gray-700 p-4 rounded-lg">
+                <div class="flex justify-between items-center mb-2">
+                  <h3 class="font-bold text-orange-500">小橘的近况更新</h3>
+                  <span class="text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 px-2 py-0.5 rounded-full">[已通过]</span>
+                </div>
+                <p class="text-xs text-gray-400 dark:text-gray-500 my-2">2023-11-05</p>
+                <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">小橘最近状态很好，体重增加了，也越来越亲人了。每天都会在门口迎接我回家...</p>
+              </div>
+              <div class="border border-gray-200 dark:border-gray-700 p-4 rounded-lg">
+                <div class="flex justify-between items-center mb-2">
+                  <h3 class="font-bold text-blue-500">寻找小白的新家</h3>
+                  <span class="text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 px-2 py-0.5 rounded-full cursor-pointer" onclick="alert('拒绝理由：帖子包含个人联系方式，不符合社区规定。\n您可以点击“重新提交”按钮修改帖子。')">[已拒绝]</span>
+                </div>
+                <p class="text-xs text-gray-400 dark:text-gray-500 my-2">2023-10-20</p>
+                <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">小白是一只非常温顺的比熊犬，已经完成所有疫苗接种，正在寻找一个有爱的永久家庭...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer class="bg-gray-800 dark:bg-black text-gray-300 dark:text-gray-400">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div>
+            <h3 class="text-white font-bold mb-2">数据统计</h3>
+            <p class="text-sm leading-loose">我们与多家救助站建立了长期合作关系，致力于为流浪动物提供更好的临时安置和长期领养服务。</p>
+            <a href="#" class="text-sm text-primary hover:underline mt-2 inline-block">查看合作救助站 →</a>
+          </div>
+          <div>
+            <h3 class="text-white font-bold mb-2">联系开发团队</h3>
+            <p class="text-sm leading-loose">如果您有任何问题、建议或合作意向，请随时联系我们的开发团队。</p>
+            <div class="flex space-x-4 mt-3" aria-label="社交图标">
+              <span class="w-6 h-6" aria-hidden="true">💬</span>
+              <span class="w-6 h-6" aria-hidden="true">💌</span>
+              <span class="w-6 h-6" aria-hidden="true">🌐</span>
+            </div>
+          </div>
+        </div>
+        <div class="border-t border-gray-700 dark:border-gray-600 mt-8 pt-6 text-center text-sm">
+          <p>2025 FUREVERHOME流浪动物领养平台 - 让每个生命都有温暖的家</p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
