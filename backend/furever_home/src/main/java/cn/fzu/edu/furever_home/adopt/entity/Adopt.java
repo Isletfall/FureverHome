@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import cn.fzu.edu.furever_home.common.enums.*;
 
 import java.time.LocalDateTime;
 
@@ -14,9 +15,9 @@ public class Adopt {
     private Integer adoptId;
     private Integer animalId;
     private Integer userId;
-    private String applicationStatus;
-    private String livingEnvironment;
-    private String houseType;
+    private ApplicationStatus applicationStatus;
+    private LivingEnvironment livingEnvironment;
+    private HouseType houseType;
     private Boolean hasOtherPets;
     private Integer familyMemberCount;
     private Boolean hasChild;
@@ -24,4 +25,5 @@ public class Adopt {
     private Integer monthSalary;
     private LocalDateTime createTime;
     private LocalDateTime passTime;
+    private ReviewStatus reviewStatus;
 }

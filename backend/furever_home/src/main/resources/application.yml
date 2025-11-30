@@ -34,7 +34,8 @@ mybatis-plus:
       id-type: auto
 
 sa-token:
-  token-name: satoken
+  token-name: Authorization
+  token-prefix: Bearer
   timeout: 2592000
   is-log: true
 

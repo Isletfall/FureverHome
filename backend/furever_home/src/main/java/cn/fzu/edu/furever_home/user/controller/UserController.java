@@ -4,12 +4,12 @@ import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import cn.fzu.edu.furever_home.common.Result;
 import cn.fzu.edu.furever_home.user.dto.UserDTO;
 import cn.fzu.edu.furever_home.user.request.UpdateUserRequest;
 import cn.fzu.edu.furever_home.user.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import cn.fzu.edu.furever_home.common.result.Result;
 
 @RestController
 @RequestMapping("/api/user")
@@ -20,7 +20,7 @@ public class UserController {
 
     @GetMapping("/me")
     @Operation(summary = "获取我的信息")
-    public Result<?> me() {
+    public Result<UserDTO> me() {
         Integer uid = StpUtil.getLoginIdAsInt();
         UserDTO dto = userProfileService.getMe(uid);
         return Result.success(dto);
@@ -28,7 +28,7 @@ public class UserController {
 
     @PutMapping("/me")
     @Operation(summary = "更新我的信息")
-    public Result<?> updateMe(@RequestBody @Valid UpdateUserRequest req) {
+    public Result<Void> updateMe(@RequestBody @Valid UpdateUserRequest req) {
         Integer uid = StpUtil.getLoginIdAsInt();
         userProfileService.updateMe(uid, req);
         return Result.success();
@@ -36,7 +36,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     @Operation(summary = "获取他人信息")
-    public Result<?> getById(@PathVariable Integer id) {
+    public Result<UserDTO> getById(@PathVariable Integer id) {
         UserDTO dto = userProfileService.getById(id);
         return Result.success(dto);
     }

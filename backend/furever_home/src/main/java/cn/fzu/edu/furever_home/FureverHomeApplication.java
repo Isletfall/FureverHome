@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.mybatis.spring.annotation.MapperScan;
 
 @SpringBootApplication
-@MapperScan({"cn.fzu.edu.furever_home.auth.mapper","cn.fzu.edu.furever_home.animal.mapper","cn.fzu.edu.furever_home.post.mapper","cn.fzu.edu.furever_home.adopt.mapper"})
+@MapperScan({"cn.fzu.edu.furever_home.auth.mapper","cn.fzu.edu.furever_home.animal.mapper","cn.fzu.edu.furever_home.post.mapper","cn.fzu.edu.furever_home.adopt.mapper","cn.fzu.edu.furever_home.review.mapper"})
 public class FureverHomeApplication {
 
     public static void main(String[] args) {

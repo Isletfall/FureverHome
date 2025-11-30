@@ -1,5 +1,7 @@
 package cn.fzu.edu.furever_home.adopt.request;
 
+import cn.fzu.edu.furever_home.common.enums.HouseType;
+import cn.fzu.edu.furever_home.common.enums.LivingEnvironment;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -14,13 +16,13 @@ public class SubmitAdoptRequest {
     @Schema(description = "动物ID")
     private Integer animalId;
 
-    @NotBlank
+    @NotNull
     @Schema(description = "居住环境")
-    private String livingEnvironment;
+    private LivingEnvironment livingEnvironment;
 
-    @NotBlank
+    @NotNull
     @Schema(description = "房屋产权")
-    private String houseType;
+    private HouseType houseType;
 
     @NotNull
     @Schema(description = "是否有其他宠物")

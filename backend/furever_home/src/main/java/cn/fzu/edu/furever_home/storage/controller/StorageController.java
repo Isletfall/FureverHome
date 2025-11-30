@@ -1,8 +1,5 @@
 package cn.fzu.edu.furever_home.storage.controller;
 
-import cn.dev33.satoken.stp.StpUtil;
-import cn.fzu.edu.furever_home.common.Result;
-import cn.fzu.edu.furever_home.storage.dto.UploadResult;
 import cn.fzu.edu.furever_home.storage.service.StorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
@@ -15,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import cn.fzu.edu.furever_home.common.result.Result;
+import io.swagger.v3.oas.annotations.Parameter;
 
 @RestController
 @RequestMapping("/api/storage")
@@ -26,7 +25,7 @@ public class StorageController {
 
     @PostMapping(value = "/upload/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "上传图片", description = "返回可直接查看的服务路由")
-    public Result<?> uploadImage(@RequestPart("file") MultipartFile file) {
+    public Result<String> uploadImage(@RequestPart("file") MultipartFile file) {
         String bucket = env.getProperty("minio.bucket-images", "images");
         String objectName = storageService.upload(bucket, file, null);
         String viewPath = "/api/storage/image/" + objectName;
@@ -35,10 +34,10 @@ public class StorageController {
 
     @PostMapping(value = "/upload/video", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "上传视频", description = "返回可直接查看的服务路由")
-    public Result<?> uploadVideo(@RequestPart("file") MultipartFile file) {
+    public Result<String> uploadVideo(@RequestPart("file") MultipartFile file) {
         long max = 100L * 1024 * 1024;
         if (file.getSize() > max) {
-            return Result.fail(400, "视频大小超过100MB");
+            return Result.error(400, "视频大小超过100MB");
         }
         String bucket = env.getProperty("minio.bucket-videos", "videos");
         String objectName = storageService.upload(bucket, file, null);
@@ -48,7 +47,7 @@ public class StorageController {
 
     @GetMapping("/image/{object}")
     @Operation(summary = "查看图片")
-    public ResponseEntity<byte[]> viewImage(@PathVariable("object") String objectName) {
+    public ResponseEntity<byte[]> viewImage(@Parameter(description = "图片对象名") @PathVariable("object") String objectName) {
         String bucket = env.getProperty("minio.bucket-images", "images");
         cn.fzu.edu.furever_home.storage.dto.FileObject f = storageService.getFile(bucket, objectName);
         return ResponseEntity.ok()
@@ -60,7 +59,7 @@ public class StorageController {
 
     @GetMapping("/video/{object}")
     @Operation(summary = "查看视频（支持分段）")
-    public ResponseEntity<StreamingResponseBody> viewVideo(@PathVariable("object") String objectName,
+    public ResponseEntity<StreamingResponseBody> viewVideo(@Parameter(description = "视频对象名") @PathVariable("object") String objectName,
             @RequestHeader(value = "Range", required = false) String range, HttpServletResponse response) {
         String bucket = env.getProperty("minio.bucket-videos", "videos");
         Long start = null;
@@ -120,7 +119,7 @@ public class StorageController {
 
     @DeleteMapping("/image/{object}")
     @Operation(summary = "删除图片")
-    public Result<?> deleteImage(@PathVariable("object") String objectName) {
+    public Result<Void> deleteImage(@Parameter(description = "图片对象名") @PathVariable("object") String objectName) {
         String bucket = env.getProperty("minio.bucket-images", "images");
         storageService.delete(bucket, objectName);
         return Result.success();
@@ -128,7 +127,7 @@ public class StorageController {
 
     @DeleteMapping("/video/{object}")
     @Operation(summary = "删除视频")
-    public Result<?> deleteVideo(@PathVariable("object") String objectName) {
+    public Result<Void> deleteVideo(@Parameter(description = "视频对象名") @PathVariable("object") String objectName) {
         String bucket = env.getProperty("minio.bucket-videos", "videos");
         storageService.delete(bucket, objectName);
         return Result.success();

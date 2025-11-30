@@ -1,7 +1,7 @@
 CREATE DATABASE IF NOT EXISTS furever_home DEFAULT CHARACTER SET utf8mb4;
 USE furever_home;
 SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE IF EXISTS email_verification, rating, comments, likes, message, chat, adopt, post, animal, user_roles, role_permissions, permissions, roles, users;
+DROP TABLE IF EXISTS email_verification, review, rating, comments, likes, message, chat, adopt, post, animal, user_roles, role_permissions, permissions, roles, users;
 SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE users (
@@ -36,6 +36,7 @@ CREATE TABLE animal (
   is_sterilized ENUM('是','否','未知') DEFAULT NULL COMMENT '是否绝育',
   adoption_status ENUM('短期领养', '长期领养') NOT NULL COMMENT '领养状态',
   short_description VARCHAR(200) COMMENT '宠物简介',
+  review_status ENUM('待审核','通过','拒绝') NOT NULL DEFAULT '待审核',
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
 
@@ -87,6 +88,7 @@ CREATE TABLE adopt (
     animal_id INT NOT NULL COMMENT '领养动物ID',
     user_id INT NOT NULL COMMENT '申请人/领养用户ID',
     application_status ENUM('申请中','申请成功','申请失败') NOT NULL DEFAULT '申请中' COMMENT '申请领养的状态',
+    review_status ENUM('待审核','通过','拒绝') NOT NULL DEFAULT '待审核',
     living_environment ENUM('宿舍','公寓','别墅','其他') NOT NULL COMMENT '申请者居住环境',
     house_type ENUM('拥有','租用') NOT NULL COMMENT '申请者房屋产权',
     has_other_pets BOOLEAN NOT NULL COMMENT '申请者是否拥有其他动物',
@@ -112,6 +114,7 @@ CREATE TABLE post (
     user_id INT NOT NULL COMMENT '发帖用户的ID',
     title VARCHAR(100) NOT NULL COMMENT '帖子标题',
     content TEXT NOT NULL COMMENT '帖子文本内容',
+    review_status ENUM('待审核','通过','拒绝') NOT NULL DEFAULT '待审核',
     media_urls JSON DEFAULT NULL COMMENT '帖子图片内容',
     view_count INT NOT NULL DEFAULT 0 COMMENT '浏览次数',
     like_count INT NOT NULL DEFAULT 0 COMMENT '点赞量',
@@ -136,6 +139,20 @@ CONSTRAINT fk_like_user
         FOREIGN KEY (user_id) REFERENCES users(user_id)
         ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='点赞关系表';
+
+CREATE TABLE review (
+    review_id INT AUTO_INCREMENT PRIMARY KEY,
+    target_type ENUM('animal','post','adopt') NOT NULL,
+    target_id INT NOT NULL,
+    status ENUM('待审核','通过','拒绝') NOT NULL DEFAULT '待审核',
+    reviewer_id INT NULL,
+    reason TEXT DEFAULT NULL,
+    extra_info JSON DEFAULT NULL,
+    create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_review_target (target_type, target_id),
+    CONSTRAINT fk_review_reviewer FOREIGN KEY (reviewer_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 # 被点赞者可能引用 post 表或 comments 表，无法在数据库层面设置单一的外键约束
 # 需要添加触发器

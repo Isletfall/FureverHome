@@ -5,6 +5,10 @@ import cn.fzu.edu.furever_home.adopt.entity.Adopt;
 import cn.fzu.edu.furever_home.adopt.mapper.AdoptMapper;
 import cn.fzu.edu.furever_home.adopt.request.SubmitAdoptRequest;
 import cn.fzu.edu.furever_home.adopt.service.AdoptService;
+import cn.fzu.edu.furever_home.common.enums.ApplicationStatus;
+import cn.fzu.edu.furever_home.common.enums.ReviewStatus;
+import cn.fzu.edu.furever_home.review.service.ReviewService;
+import cn.fzu.edu.furever_home.common.enums.ReviewTargetType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +19,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AdoptServiceImpl implements AdoptService {
     private final AdoptMapper adoptMapper;
+    private final ReviewService reviewService;
 
     @Override
     public Integer submit(Integer userId, SubmitAdoptRequest req) {
@@ -27,7 +32,7 @@ public class AdoptServiceImpl implements AdoptService {
         Adopt a = new Adopt();
         a.setAnimalId(req.getAnimalId());
         a.setUserId(userId);
-        a.setApplicationStatus("申请中");
+        a.setApplicationStatus(ApplicationStatus.APPLYING);
         a.setLivingEnvironment(req.getLivingEnvironment());
         a.setHouseType(req.getHouseType());
         a.setHasOtherPets(req.getHasOtherPets());
@@ -37,6 +42,7 @@ public class AdoptServiceImpl implements AdoptService {
         a.setMonthSalary(req.getMonthSalary());
         a.setCreateTime(LocalDateTime.now());
         adoptMapper.insert(a);
+        reviewService.createPending(ReviewTargetType.ADOPT, a.getAdoptId());
         return a.getAdoptId();
     }
 
@@ -47,15 +53,17 @@ public class AdoptServiceImpl implements AdoptService {
     }
 
     @Override
-    public void review(Integer id, String status) {
+    public void review(Integer id, ApplicationStatus status) {
         Adopt a = adoptMapper.selectById(id);
         if (a == null) throw new IllegalStateException("申请不存在");
-        if (!"申请成功".equals(status) && !"申请失败".equals(status)) {
+        if (status != ApplicationStatus.SUCCESS && status != ApplicationStatus.FAIL) {
             throw new IllegalArgumentException("状态不合法");
         }
         a.setApplicationStatus(status);
+        a.setReviewStatus(status == ApplicationStatus.SUCCESS ? ReviewStatus.APPROVED : ReviewStatus.REJECTED);
         a.setPassTime(LocalDateTime.now());
         adoptMapper.updateById(a);
+        reviewService.updateStatus(ReviewTargetType.ADOPT, a.getAdoptId(), a.getReviewStatus());
     }
 
     private AdoptDTO toDTO(Adopt a) {
@@ -74,6 +82,7 @@ public class AdoptServiceImpl implements AdoptService {
         d.setMonthSalary(a.getMonthSalary());
         d.setCreateTime(a.getCreateTime());
         d.setPassTime(a.getPassTime());
+        d.setReviewStatus(a.getReviewStatus());
         return d;
     }
 }

@@ -7,6 +7,8 @@ import cn.fzu.edu.furever_home.auth.mapper.RoleMapper;
 import cn.fzu.edu.furever_home.auth.mapper.UserMapper;
 import cn.fzu.edu.furever_home.auth.mapper.UserRoleMapper;
 import cn.fzu.edu.furever_home.auth.service.AuthService;
+import cn.fzu.edu.furever_home.common.enums.Sex;
+import cn.fzu.edu.furever_home.common.enums.UserStatus;
 import cn.fzu.edu.furever_home.tools.mail.EmailSender;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -88,8 +90,8 @@ public class AuthServiceImpl implements AuthService {
         u.setEmail(email);
         u.setPasswordHash(encoder.encode(rawPassword));
         u.setUserAge(18);
-        u.setSex("男");
-        u.setStatus("正常");
+        u.setSex(Sex.valueOf("男"));
+        u.setStatus(UserStatus.valueOf("正常"));
         u.setCreateTime(LocalDateTime.now());
         u.setUpdatedAt(LocalDateTime.now());
         try {

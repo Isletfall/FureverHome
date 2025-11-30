@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface PostService {
     List<PostDTO> listAll();
-    PostDTO getById(Integer id, boolean incView);
+    PostDTO getById(Integer id);
     Integer create(Integer userId, CreatePostRequest req);
     void update(Integer userId, Integer id, UpdatePostRequest req);
     void delete(Integer userId, Integer id);

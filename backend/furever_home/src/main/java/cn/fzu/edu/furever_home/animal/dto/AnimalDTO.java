@@ -1,19 +1,36 @@
 package cn.fzu.edu.furever_home.animal.dto;
 
 import lombok.Data;
+import io.swagger.v3.oas.annotations.media.Schema;
+import cn.fzu.edu.furever_home.common.enums.*;
 
 @Data
+@Schema(name = "动物信息", description = "动物基础信息DTO")
 public class AnimalDTO {
+    @Schema(description = "动物ID")
     private Integer animalId;
+    @Schema(description = "发布用户ID")
     private Integer userId;
+    @Schema(description = "动物名称")
     private String animalName;
+    @Schema(description = "照片URL（图片链接）")
     private String photoUrls;
-    private String species;
+    @Schema(description = "动物种类")
+    private Species species;
+    @Schema(description = "品种")
     private String breed;
-    private String gender;
+    @Schema(description = "性别")
+    private Gender gender;
+    @Schema(description = "年龄")
     private Integer animalAge;
+    @Schema(description = "健康状况")
     private String healthStatus;
-    private String isSterilized;
-    private String adoptionStatus;
+    @Schema(description = "是否绝育")
+    private SterilizedStatus isSterilized;
+    @Schema(description = "领养状态")
+    private AdoptionStatus adoptionStatus;
+    @Schema(description = "简短描述")
     private String shortDescription;
+    @Schema(description = "审核状态")
+    private ReviewStatus reviewStatus;
 }

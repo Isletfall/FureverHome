@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import cn.fzu.edu.furever_home.common.enums.ReviewStatus;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +16,7 @@ public class Post {
     private Integer userId;
     private String title;
     private String content;
+    private ReviewStatus reviewStatus;
     private String mediaUrls;
     private Integer viewCount;
     private Integer likeCount;

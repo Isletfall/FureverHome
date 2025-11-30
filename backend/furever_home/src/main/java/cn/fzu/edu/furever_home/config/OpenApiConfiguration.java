@@ -13,12 +13,12 @@ public class OpenApiConfiguration {
     @Bean
     public OpenAPI api() {
         SecurityScheme token = new SecurityScheme()
-                .type(SecurityScheme.Type.APIKEY)
-                .in(SecurityScheme.In.HEADER)
-                .name("satoken");
+                .type(SecurityScheme.Type.HTTP)
+                .scheme("bearer")
+                .bearerFormat("Sa-Token");
         return new OpenAPI()
                 .info(new Info().title("Furever Home API").version("v1"))
-                .addSecurityItem(new SecurityRequirement().addList("satoken"))
-                .components(new Components().addSecuritySchemes("satoken", token));
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+                .components(new Components().addSecuritySchemes("bearerAuth", token));
     }
 }

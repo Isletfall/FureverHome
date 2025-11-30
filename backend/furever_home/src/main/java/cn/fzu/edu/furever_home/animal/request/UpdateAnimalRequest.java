@@ -1,6 +1,7 @@
 package cn.fzu.edu.furever_home.animal.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import cn.fzu.edu.furever_home.common.enums.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -8,19 +9,29 @@ import lombok.Data;
 @Data
 @Schema(name = "UpdateAnimalRequest", description = "更新动物信息请求体")
 public class UpdateAnimalRequest {
+    @Schema(description = "动物名字")
     @Size(max = 50)
     private String animalName;
+    @Schema(description = "动物照片（图片链接）")
     private String photoUrls;
-    private String species;
+    @Schema(description = "动物种类")
+    private Species species;
+    @Schema(description = "动物品种")
     @Size(max = 50)
     private String breed;
-    private String gender;
+    @Schema(description = "性别")
+    private Gender gender;
+    @Schema(description = "月龄")
     @Min(0)
     private Integer animalAge;
+    @Schema(description = "健康状态")
     @Size(max = 200)
     private String healthStatus;
-    private String isSterilized;
-    private String adoptionStatus;
+    @Schema(description = "是否绝育")
+    private SterilizedStatus isSterilized;
+    @Schema(description = "领养状态")
+    private AdoptionStatus adoptionStatus;
+    @Schema(description = "宠物简介")
     @Size(max = 200)
     private String shortDescription;
 }

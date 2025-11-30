@@ -17,6 +17,6 @@ public class CreatePostRequest {
     @NotBlank
     private String content;
 
-    @Schema(description = "媒体URL（JSON数组字符串）")
+    @Schema(description = "图片链接")
     private String mediaUrls;
 }

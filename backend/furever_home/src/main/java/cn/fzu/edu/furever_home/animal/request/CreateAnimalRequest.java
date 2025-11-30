@@ -1,8 +1,13 @@
 package cn.fzu.edu.furever_home.animal.request;
 
+import cn.fzu.edu.furever_home.common.enums.AdoptionStatus;
+import cn.fzu.edu.furever_home.common.enums.Gender;
+import cn.fzu.edu.furever_home.common.enums.Species;
+import cn.fzu.edu.furever_home.common.enums.SterilizedStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -14,20 +19,20 @@ public class CreateAnimalRequest {
     @Size(max = 50)
     private String animalName;
 
-    @Schema(description = "动物照片（JSON数组字符串）")
+    @Schema(description = "动物照片（图片链接）")
     private String photoUrls;
 
     @Schema(description = "动物种类")
-    @NotBlank
-    private String species;
+    @NotNull
+    private Species species;
 
     @Schema(description = "动物品种")
     @Size(max = 50)
     private String breed;
 
     @Schema(description = "性别")
-    @NotBlank
-    private String gender;
+    @NotNull
+    private Gender gender;
 
     @Schema(description = "月龄")
     @Min(0)
@@ -39,12 +44,12 @@ public class CreateAnimalRequest {
     private String healthStatus;
 
     @Schema(description = "是否绝育")
-    @NotBlank
-    private String isSterilized;
+    @NotNull
+    private SterilizedStatus isSterilized;
 
     @Schema(description = "领养状态")
-    @NotBlank
-    private String adoptionStatus;
+    @NotNull
+    private AdoptionStatus adoptionStatus;
 
     @Schema(description = "宠物简介")
     @Size(max = 200)

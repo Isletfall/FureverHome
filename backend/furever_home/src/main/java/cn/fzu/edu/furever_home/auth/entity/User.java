@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import lombok.Data;
+import cn.fzu.edu.furever_home.common.enums.*;
 
 import java.time.LocalDateTime;
 
@@ -17,13 +18,13 @@ public class User {
     private String passwordHash;
     private String email;
     private String avatarUrl;
-    private String sex;
+    private Sex sex;
     private String location;
     private String proofText;
     private String proofPhoto;
     private Double creditScore;
     private Integer creditScoreCount;
-    private String status;
+    private UserStatus status;
     private LocalDateTime createTime;
     private LocalDateTime updatedAt;
     private LocalDateTime lastLoginAt;

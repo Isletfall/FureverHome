@@ -6,6 +6,9 @@ import cn.fzu.edu.furever_home.post.mapper.PostMapper;
 import cn.fzu.edu.furever_home.post.request.CreatePostRequest;
 import cn.fzu.edu.furever_home.post.request.UpdatePostRequest;
 import cn.fzu.edu.furever_home.post.service.PostService;
+import cn.fzu.edu.furever_home.review.service.ReviewService;
+import cn.fzu.edu.furever_home.common.enums.ReviewTargetType;
+import cn.fzu.edu.furever_home.common.enums.ReviewStatus;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,20 +21,21 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
     private final PostMapper postMapper;
+    private final ReviewService reviewService;
 
     @Override
     public List<PostDTO> listAll() {
-        return postMapper.selectList(new LambdaQueryWrapper<>()).stream().map(this::toDTO).collect(Collectors.toList());
+        return postMapper.selectList(new LambdaQueryWrapper<Post>()
+                        .eq(Post::getReviewStatus, ReviewStatus.APPROVED))
+                .stream().map(this::toDTO).collect(Collectors.toList());
     }
 
     @Override
-    public PostDTO getById(Integer id, boolean incView) {
+    public PostDTO getById(Integer id) {
         Post p = postMapper.selectById(id);
-        if (p == null) return null;
-        if (incView) {
-            p.setViewCount((p.getViewCount() == null ? 0 : p.getViewCount()) + 1);
-            postMapper.updateById(p);
-        }
+        if (p == null || p.getReviewStatus() != ReviewStatus.APPROVED) return null;
+        p.setViewCount((p.getViewCount() == null ? 0 : p.getViewCount()) + 1);
+        postMapper.updateById(p);
         return toDTO(p);
     }
 
@@ -47,6 +51,7 @@ public class PostServiceImpl implements PostService {
         p.setCommentCount(0);
         p.setCreateTime(LocalDateTime.now());
         postMapper.insert(p);
+        reviewService.createPending(ReviewTargetType.POST, p.getPostId());
         return p.getPostId();
     }
 
@@ -76,6 +81,7 @@ public class PostServiceImpl implements PostService {
         d.setUserId(p.getUserId());
         d.setTitle(p.getTitle());
         d.setContent(p.getContent());
+        d.setReviewStatus(p.getReviewStatus());
         d.setMediaUrls(p.getMediaUrls());
         d.setViewCount(p.getViewCount());
         d.setLikeCount(p.getLikeCount());

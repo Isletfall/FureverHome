@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import cn.fzu.edu.furever_home.common.enums.*;
 
 import java.time.LocalDateTime;
 
@@ -15,14 +16,15 @@ public class Animal {
     private Integer userId;
     private String animalName;
     private String photoUrls;
-    private String species;
+    private Species species;
     private String breed;
-    private String gender;
+    private Gender gender;
     private Integer animalAge;
     private String healthStatus;
-    private String isSterilized;
-    private String adoptionStatus;
+    private SterilizedStatus isSterilized;
+    private AdoptionStatus adoptionStatus;
     private String shortDescription;
+    private ReviewStatus reviewStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
