@@ -4,6 +4,8 @@ import cn.fzu.edu.furever_home.admin.dto.DashboardStatisticsDTO;
 import cn.fzu.edu.furever_home.admin.service.AdminDashboardService;
 import cn.fzu.edu.furever_home.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +22,7 @@ public class AdminDashboardController {
 
     @GetMapping("/statistics")
     @Operation(summary = "获取管理后台首页统计数据")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
     public Result<DashboardStatisticsDTO> statistics() {
         DashboardStatisticsDTO statistics = adminDashboardService.getStatistics();
         return Result.success(statistics);

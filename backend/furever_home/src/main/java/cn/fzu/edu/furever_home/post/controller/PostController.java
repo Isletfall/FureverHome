@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import cn.fzu.edu.furever_home.common.result.Result;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class PostController {
 
     @GetMapping("/list")
     @Operation(summary = "获取帖子列表")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
     public Result<java.util.List<PostDTO>> list() {
         List<PostDTO> list = postService.listAll();
         return Result.success(list);
@@ -32,6 +34,7 @@ public class PostController {
 
     @GetMapping("/{id}")
     @Operation(summary = "获取帖子详情")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
     public Result<PostDTO> detail(@Parameter(description = "帖子ID") @PathVariable Integer id) {
         PostDTO dto = postService.getById(id);
         return Result.success(dto);
@@ -40,6 +43,7 @@ public class PostController {
     @PostMapping
     @SaCheckPermission("post:create")
     @Operation(summary = "发布帖子")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
     public Result<Integer> create(@RequestBody @Valid CreatePostRequest req) {
         Integer uid = StpUtil.getLoginIdAsInt();
         Integer id = postService.create(uid, req);
@@ -49,6 +53,7 @@ public class PostController {
     @PutMapping("/{id}")
     @SaCheckPermission("post:create")
     @Operation(summary = "更新帖子")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
     public Result<Void> update(@Parameter(description = "帖子ID") @PathVariable Integer id, @RequestBody @Valid UpdatePostRequest req) {
         Integer uid = StpUtil.getLoginIdAsInt();
         postService.update(uid, id, req);
@@ -58,6 +63,7 @@ public class PostController {
     @DeleteMapping("/{id}")
     @SaCheckPermission("post:delete")
     @Operation(summary = "删除帖子")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
     public Result<Void> delete(@Parameter(description = "帖子ID") @PathVariable Integer id) {
         Integer uid = StpUtil.getLoginIdAsInt();
         postService.delete(uid, id);

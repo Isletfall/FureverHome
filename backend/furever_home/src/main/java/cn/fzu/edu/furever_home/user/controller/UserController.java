@@ -10,6 +10,8 @@ import cn.fzu.edu.furever_home.user.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import cn.fzu.edu.furever_home.common.result.Result;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 
 @RestController
 @RequestMapping("/api/user")
@@ -20,6 +22,7 @@ public class UserController {
 
     @GetMapping("/me")
     @Operation(summary = "获取我的信息")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
     public Result<UserDTO> me() {
         Integer uid = StpUtil.getLoginIdAsInt();
         UserDTO dto = userProfileService.getMe(uid);
@@ -28,6 +31,7 @@ public class UserController {
 
     @PutMapping("/me")
     @Operation(summary = "更新我的信息")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
     public Result<Void> updateMe(@RequestBody @Valid UpdateUserRequest req) {
         Integer uid = StpUtil.getLoginIdAsInt();
         userProfileService.updateMe(uid, req);
@@ -36,6 +40,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     @Operation(summary = "获取他人信息")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
     public Result<UserDTO> getById(@PathVariable Integer id) {
         UserDTO dto = userProfileService.getById(id);
         return Result.success(dto);

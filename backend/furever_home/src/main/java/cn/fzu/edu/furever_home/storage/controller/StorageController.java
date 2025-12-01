@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import cn.fzu.edu.furever_home.common.result.Result;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 
 @RestController
 @RequestMapping("/api/storage")
@@ -25,6 +26,7 @@ public class StorageController {
 
     @PostMapping(value = "/upload/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "上传图片", description = "返回可直接查看的服务路由")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
     public Result<String> uploadImage(@RequestPart("file") MultipartFile file) {
         String bucket = env.getProperty("minio.bucket-images", "images");
         String objectName = storageService.upload(bucket, file, null);
@@ -34,6 +36,7 @@ public class StorageController {
 
     @PostMapping(value = "/upload/video", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "上传视频", description = "返回可直接查看的服务路由")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
     public Result<String> uploadVideo(@RequestPart("file") MultipartFile file) {
         long max = 100L * 1024 * 1024;
         if (file.getSize() > max) {
@@ -119,6 +122,7 @@ public class StorageController {
 
     @DeleteMapping("/image/{object}")
     @Operation(summary = "删除图片")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
     public Result<Void> deleteImage(@Parameter(description = "图片对象名") @PathVariable("object") String objectName) {
         String bucket = env.getProperty("minio.bucket-images", "images");
         storageService.delete(bucket, objectName);
@@ -127,6 +131,7 @@ public class StorageController {
 
     @DeleteMapping("/video/{object}")
     @Operation(summary = "删除视频")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
     public Result<Void> deleteVideo(@Parameter(description = "视频对象名") @PathVariable("object") String objectName) {
         String bucket = env.getProperty("minio.bucket-videos", "videos");
         storageService.delete(bucket, objectName);

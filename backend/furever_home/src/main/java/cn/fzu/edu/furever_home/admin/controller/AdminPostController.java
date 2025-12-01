@@ -10,6 +10,7 @@ import cn.fzu.edu.furever_home.common.result.PageResult;
 import cn.fzu.edu.furever_home.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class AdminPostController {
     @GetMapping("/pending")
     //@SaCheckRole("ADMIN")
     @Operation(summary = "获取待审核帖子列表")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
     public Result<PageResult<AdminPostSummaryDTO>> listPending(
             @Parameter(description = "页码，从1开始") @RequestParam(defaultValue = "1") int page,
             @Parameter(description = "每页数量") @RequestParam(defaultValue = "10") int pageSize,
@@ -37,6 +39,7 @@ public class AdminPostController {
     @GetMapping("/published")
     //@SaCheckRole("ADMIN")
     @Operation(summary = "获取已发布帖子列表")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
     public Result<PageResult<AdminPostSummaryDTO>> listPublished(
             @Parameter(description = "页码，从1开始") @RequestParam(defaultValue = "1") int page,
             @Parameter(description = "每页数量") @RequestParam(defaultValue = "10") int pageSize,
@@ -48,6 +51,7 @@ public class AdminPostController {
     @GetMapping("/{id}")
     //@SaCheckRole("ADMIN")
     @Operation(summary = "获取帖子详情（含评论）")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
     public Result<AdminPostDetailDTO> getDetail(@Parameter(description = "帖子ID") @PathVariable Integer id) {
         AdminPostDetailDTO dto = adminPostService.getDetail(id);
         return Result.success(dto);
@@ -56,6 +60,7 @@ public class AdminPostController {
     @PostMapping("/{id}/approve")
     //@SaCheckRole("ADMIN")
     @Operation(summary = "审核通过帖子")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
     public Result<Void> approve(
             @Parameter(description = "帖子ID") @PathVariable Integer id,
             @RequestBody(required = false) @Valid PostReviewRequest body) {
@@ -68,6 +73,7 @@ public class AdminPostController {
     @PostMapping("/{id}/reject")
     //@SaCheckRole("ADMIN")
     @Operation(summary = "审核拒绝帖子")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
     public Result<Void> reject(
             @Parameter(description = "帖子ID") @PathVariable Integer id,
             @RequestBody @Valid PostReviewRequest body) {
@@ -79,6 +85,7 @@ public class AdminPostController {
     @DeleteMapping("/{id}")
     //@SaCheckRole("ADMIN")
     @Operation(summary = "删除帖子")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
     public Result<Void> delete(@Parameter(description = "帖子ID") @PathVariable Integer id) {
         adminPostService.delete(id);
         return Result.success();

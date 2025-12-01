@@ -4,7 +4,7 @@ spring:
   datasource:
     url: ${DB_URL:jdbc:mysql://localhost:3306/furever_home?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:123456}
+    password: ${DB_PASSWORD:s88159868}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   mail:
@@ -41,7 +41,7 @@ sa-token:
   is-log: true
 
 server:
-  port: ${SERVER_PORT:8081}
+  port: ${SERVER_PORT:8080}
   tomcat:
     connection-timeout: 60000 # 连接超时 60 秒（避免视频传输中断）
     max-connections: 10000 # 最大并发连接数
