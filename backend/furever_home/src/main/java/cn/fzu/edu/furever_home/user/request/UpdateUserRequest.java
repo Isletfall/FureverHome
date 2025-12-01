@@ -4,9 +4,9 @@ import cn.fzu.edu.furever_home.common.enums.Sex;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import java.util.List;
 
 @Data
 @Schema(name = "UpdateUserRequest", description = "更新用户信息请求体")
@@ -31,6 +31,6 @@ public class UpdateUserRequest {
     @Size(max = 500)
     private String proofText;
 
-    @Schema(description = "爱宠证明图片链接")
-    private String proofPhoto;
+    @Schema(description = "爱宠证明图片URL列表（JSON数组）", example = "[\"https://img.example.com/p1.jpg\",\"https://img.example.com/p2.jpg\"]")
+    private List<String> proofPhoto;
 }

@@ -4,6 +4,8 @@ import lombok.Data;
 import io.swagger.v3.oas.annotations.media.Schema;
 import cn.fzu.edu.furever_home.common.enums.*;
 
+import java.util.List;
+
 @Data
 @Schema(name = "动物信息", description = "动物基础信息DTO")
 public class AnimalDTO {
@@ -13,8 +15,8 @@ public class AnimalDTO {
     private Integer userId;
     @Schema(description = "动物名称")
     private String animalName;
-    @Schema(description = "照片URL（图片链接）")
-    private String photoUrls;
+    @Schema(description = "照片URL列表（JSON数组）", example = "[\"https://img.example.com/a.jpg\",\"https://img.example.com/b.jpg\"]")
+    private List<String> photoUrls;
     @Schema(description = "动物种类")
     private Species species;
     @Schema(description = "品种")

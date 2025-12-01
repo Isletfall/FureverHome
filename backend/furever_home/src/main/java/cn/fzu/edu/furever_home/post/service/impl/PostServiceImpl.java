@@ -14,8 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
+import cn.fzu.edu.furever_home.common.result.PageResult;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @Service
 @RequiredArgsConstructor
@@ -24,10 +24,49 @@ public class PostServiceImpl implements PostService {
     private final ReviewService reviewService;
 
     @Override
-    public List<PostDTO> listAll() {
-        return postMapper.selectList(new LambdaQueryWrapper<Post>()
-                        .eq(Post::getReviewStatus, ReviewStatus.APPROVED))
-                .stream().map(this::toDTO).collect(Collectors.toList());
+    public PageResult<PostDTO> pageAll(int page, int pageSize) {
+        Page<Post> mpPage = new Page<>(page, pageSize);
+        LambdaQueryWrapper<Post> wrapper = new LambdaQueryWrapper<Post>()
+                .eq(Post::getReviewStatus, ReviewStatus.APPROVED)
+                .orderByDesc(Post::getCreateTime);
+        Page<Post> result = postMapper.selectPage(mpPage, wrapper);
+        java.util.List<PostDTO> records = result.getRecords().stream().map(this::toDTO).toList();
+        return new PageResult<>(result.getCurrent(), result.getSize(), result.getTotal(), records);
+    }
+
+    @Override
+    public PageResult<PostDTO> pageMine(Integer userId, int page, int pageSize) {
+        Page<Post> mpPage = new Page<>(page, pageSize);
+        LambdaQueryWrapper<Post> wrapper = new LambdaQueryWrapper<Post>()
+                .eq(Post::getUserId, userId)
+                .orderByDesc(Post::getCreateTime);
+        Page<Post> result = postMapper.selectPage(mpPage, wrapper);
+        java.util.List<PostDTO> records = result.getRecords().stream().map(this::toDTO).toList();
+        return new PageResult<>(result.getCurrent(), result.getSize(), result.getTotal(), records);
+    }
+
+    @Override
+    public PageResult<cn.fzu.edu.furever_home.post.dto.PostPublicDTO> pageByUser(Integer userId, int page, int pageSize) {
+        Page<Post> mpPage = new Page<>(page, pageSize);
+        LambdaQueryWrapper<Post> wrapper = new LambdaQueryWrapper<Post>()
+                .eq(Post::getUserId, userId)
+                .eq(Post::getReviewStatus, ReviewStatus.APPROVED)
+                .orderByDesc(Post::getCreateTime);
+        Page<Post> result = postMapper.selectPage(mpPage, wrapper);
+        java.util.List<cn.fzu.edu.furever_home.post.dto.PostPublicDTO> records = result.getRecords().stream().map(p -> {
+            cn.fzu.edu.furever_home.post.dto.PostPublicDTO d = new cn.fzu.edu.furever_home.post.dto.PostPublicDTO();
+            d.setPostId(p.getPostId());
+            d.setUserId(p.getUserId());
+            d.setTitle(p.getTitle());
+            d.setContent(p.getContent());
+            d.setMediaUrls(p.getMediaUrls());
+            d.setViewCount(p.getViewCount());
+            d.setLikeCount(p.getLikeCount());
+            d.setCommentCount(p.getCommentCount());
+            d.setCreateTime(p.getCreateTime());
+            return d;
+        }).toList();
+        return new PageResult<>(result.getCurrent(), result.getSize(), result.getTotal(), records);
     }
 
     @Override

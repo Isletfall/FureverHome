@@ -11,6 +11,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Schema(name = "CreateAnimalRequest", description = "发布动物信息请求体")
 public class CreateAnimalRequest {
@@ -19,8 +21,8 @@ public class CreateAnimalRequest {
     @Size(max = 50)
     private String animalName;
 
-    @Schema(description = "动物照片（图片链接）")
-    private String photoUrls;
+    @Schema(description = "动物照片URL列表（JSON数组）", example = "[\"https://img.example.com/a.jpg\",\"https://img.example.com/b.jpg\"]")
+    private List<String> photoUrls;
 
     @Schema(description = "动物种类")
     @NotNull

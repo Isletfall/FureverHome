@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 public class AdoptServiceImpl implements AdoptService {
     private final AdoptMapper adoptMapper;
     private final ReviewService reviewService;
+    private final cn.fzu.edu.furever_home.animal.mapper.AnimalMapper animalMapper;
 
     @Override
     public Integer submit(Integer userId, SubmitAdoptRequest req) {
@@ -64,6 +65,22 @@ public class AdoptServiceImpl implements AdoptService {
         a.setPassTime(LocalDateTime.now());
         adoptMapper.updateById(a);
         reviewService.updateStatus(ReviewTargetType.ADOPT, a.getAdoptId(), a.getReviewStatus());
+    }
+
+    @Override
+    public java.util.List<Adopt> listByAnimalOwner(Integer ownerUserId) {
+        java.util.List<Integer> myAnimalIds = animalMapper.selectList(new LambdaQueryWrapper<cn.fzu.edu.furever_home.animal.entity.Animal>()
+                        .eq(cn.fzu.edu.furever_home.animal.entity.Animal::getUserId, ownerUserId))
+                .stream().map(cn.fzu.edu.furever_home.animal.entity.Animal::getAnimalId).toList();
+        if (myAnimalIds.isEmpty()) return java.util.Collections.emptyList();
+        return adoptMapper.selectList(new LambdaQueryWrapper<Adopt>().in(Adopt::getAnimalId, myAnimalIds)
+                .orderByDesc(Adopt::getCreateTime));
+    }
+
+    @Override
+    public java.util.List<Adopt> listByApplicant(Integer applicantUserId) {
+        return adoptMapper.selectList(new LambdaQueryWrapper<Adopt>().eq(Adopt::getUserId, applicantUserId)
+                .orderByDesc(Adopt::getCreateTime));
     }
 
     private AdoptDTO toDTO(Adopt a) {

@@ -32,7 +32,7 @@ public class AuthController {
         if (!authService.matches(req.getPassword(), u.getPasswordHash()))
             return Result.error(401, "密码错误");
         StpUtil.login(u.getUserId());
-        return Result.success(StpUtil.getTokenInfo());
+        return Result.success("登录成功", StpUtil.getTokenInfo());
     }
 
     @PostMapping("/logout")

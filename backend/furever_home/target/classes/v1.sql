@@ -7,11 +7,11 @@ SET FOREIGN_KEY_CHECKS = 1;
 CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY COMMENT '用户ID',
     user_name VARCHAR(50) NOT NULL UNIQUE COMMENT '用户名',
-    user_age INT NOT NULL COMMENT '年龄',
+    user_age INT DEFAULT NULL COMMENT '年龄',
     password_hash VARCHAR(255) NOT NULL COMMENT '密码哈希',
     email VARCHAR(255) NOT NULL UNIQUE COMMENT '邮箱号',
     avatar_url VARCHAR(255) DEFAULT NULL COMMENT '头像',
-    sex ENUM('男', '女') NOT NULL COMMENT '性别',
+    sex ENUM('男', '女', '保密') DEFAULT NULL COMMENT '性别',
     location VARCHAR(50) DEFAULT NULL COMMENT '所在地',
     proof_text VARCHAR(500) DEFAULT NULL COMMENT '爱宠证明简介',
     proof_photo JSON DEFAULT NULL COMMENT '爱宠证明',
@@ -181,19 +181,21 @@ CONSTRAINT fk_comment_parent
 CREATE TABLE rating (
     rating_id INT AUTO_INCREMENT PRIMARY KEY COMMENT '信用评分记录ID',
     user_id INT NOT NULL COMMENT '发布评分的用户ID',
-    adopt_id INT NOT NULL COMMENT '对哪条领养记录（ID）评分',
+    target_user_id INT NOT NULL COMMENT '被评价的用户ID',
+    adopt_id INT NULL COMMENT '关联的领养记录ID（可选）',
     score INT NOT NULL CHECK (score BETWEEN 1 AND 5) COMMENT '评分分数',
     content TEXT DEFAULT NULL COMMENT '评价内容',
     create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 
--- 外键约束：关联 users 表
+    -- 外键约束：关联 users 表
 CONSTRAINT fk_rating_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+CONSTRAINT fk_rating_target_user FOREIGN KEY (target_user_id) REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
 
--- 外键约束：关联 adopt 表
+    -- 外键约束：关联 adopt 表（可选）
 CONSTRAINT fk_rating_adopt FOREIGN KEY (adopt_id) REFERENCES adopt (adopt_id) ON DELETE CASCADE ON UPDATE CASCADE,
 
--- 添加唯一约束，防止同一用户对同一领养记录重复评分
-UNIQUE KEY uk_rating_user_adopt (user_id, adopt_id)
+    -- 添加唯一约束，防止同一用户对同一用户重复评分
+UNIQUE KEY uk_rating_user_target (user_id, target_user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='记录评分信息';
 
 -- RBAC 权限模型
@@ -318,6 +320,8 @@ INSERT INTO adopt (animal_id, user_id, application_status, living_environment, h
 SELECT a.animal_id, u.user_id, '申请成功', '公寓', '租用', FALSE, 2, FALSE, '非常喜欢猫咪，有稳定收入', 8000, CURRENT_TIMESTAMP
 FROM animal a JOIN users u ON a.animal_name='雪球' AND u.user_name='bob';
 
-INSERT INTO rating (user_id, adopt_id, score, content)
-SELECT ur.user_id, ad.adopt_id, 5, '领养过程顺利，沟通良好'
-FROM users ur JOIN adopt ad ON ur.user_name='alice';
+INSERT INTO rating (user_id, target_user_id, adopt_id, score, content)
+SELECT ur.user_id, owner.user_id AS target_user_id, ad.adopt_id, 5, '领养过程顺利，沟通良好'
+FROM users ur JOIN adopt ad ON ur.user_name='alice'
+JOIN animal an ON ad.animal_id = an.animal_id
+JOIN users owner ON owner.user_id = an.user_id;

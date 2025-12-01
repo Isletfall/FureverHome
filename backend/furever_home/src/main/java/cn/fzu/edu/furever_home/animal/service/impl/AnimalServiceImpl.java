@@ -3,6 +3,7 @@ package cn.fzu.edu.furever_home.animal.service.impl;
 import cn.fzu.edu.furever_home.animal.dto.AnimalDTO;
 import cn.fzu.edu.furever_home.animal.entity.Animal;
 import cn.fzu.edu.furever_home.animal.mapper.AnimalMapper;
+import cn.fzu.edu.furever_home.common.enums.AdoptionStatus;
 import cn.fzu.edu.furever_home.common.enums.ReviewStatus;
 import cn.fzu.edu.furever_home.common.enums.ReviewTargetType;
 import cn.fzu.edu.furever_home.review.service.ReviewService;
@@ -14,8 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
+import cn.fzu.edu.furever_home.common.result.PageResult;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @Service
 @RequiredArgsConstructor
@@ -24,18 +25,23 @@ public class AnimalServiceImpl implements AnimalService {
     private final ReviewService reviewService;
 
     @Override
-    public List<AnimalDTO> listAll() {
-        return animalMapper.selectList(new LambdaQueryWrapper<Animal>()
-                        .eq(Animal::getReviewStatus, ReviewStatus.APPROVED))
-                .stream().map(this::toDTO)
-                .collect(Collectors.toList());
+    public PageResult<AnimalDTO> pageAll(int page, int pageSize) {
+        Page<Animal> mpPage = new Page<>(page, pageSize);
+        LambdaQueryWrapper<Animal> wrapper = new LambdaQueryWrapper<Animal>()
+                .eq(Animal::getReviewStatus, ReviewStatus.APPROVED)
+                .orderByDesc(Animal::getCreatedAt);
+        Page<Animal> result = animalMapper.selectPage(mpPage, wrapper);
+        java.util.List<AnimalDTO> records = result.getRecords().stream().map(this::toDTO).toList();
+        return new PageResult<>(result.getCurrent(), result.getSize(), result.getTotal(), records);
     }
 
     @Override
-    public AnimalDTO getById(Integer id) {
+    public AnimalDTO getById(Integer id, Integer currentUserId) {
         Animal a = animalMapper.selectById(id);
-        if (a == null || a.getReviewStatus() != ReviewStatus.APPROVED) return null;
-        return toDTO(a);
+        if (a == null) return null;
+        if (a.getReviewStatus() == ReviewStatus.APPROVED) return toDTO(a);
+        if (currentUserId != null && a.getUserId() != null && a.getUserId().equals(currentUserId)) return toDTO(a);
+        return null;
     }
 
     @Override
@@ -118,5 +124,45 @@ public class AnimalServiceImpl implements AnimalService {
         d.setShortDescription(a.getShortDescription());
         d.setReviewStatus(a.getReviewStatus());
         return d;
+    }
+
+    @Override
+    public PageResult<AnimalDTO> pageMineByAdoption(Integer userId, AdoptionStatus adoptionStatus, int page, int pageSize) {
+        Page<Animal> mpPage = new Page<>(page, pageSize);
+        LambdaQueryWrapper<Animal> wrapper = new LambdaQueryWrapper<Animal>()
+                .eq(Animal::getUserId, userId)
+                .eq(Animal::getAdoptionStatus, adoptionStatus)
+                .orderByDesc(Animal::getCreatedAt);
+        Page<Animal> result = animalMapper.selectPage(mpPage, wrapper);
+        java.util.List<AnimalDTO> records = result.getRecords().stream().map(this::toDTO).toList();
+        return new PageResult<>(result.getCurrent(), result.getSize(), result.getTotal(), records);
+    }
+
+    @Override
+    public PageResult<cn.fzu.edu.furever_home.animal.dto.AnimalPublicDTO> pageUserByAdoption(Integer userId, AdoptionStatus adoptionStatus, int page, int pageSize) {
+        Page<Animal> mpPage = new Page<>(page, pageSize);
+        LambdaQueryWrapper<Animal> wrapper = new LambdaQueryWrapper<Animal>()
+                .eq(Animal::getUserId, userId)
+                .eq(Animal::getAdoptionStatus, adoptionStatus)
+                .eq(Animal::getReviewStatus, ReviewStatus.APPROVED)
+                .orderByDesc(Animal::getCreatedAt);
+        Page<Animal> result = animalMapper.selectPage(mpPage, wrapper);
+        java.util.List<cn.fzu.edu.furever_home.animal.dto.AnimalPublicDTO> records = result.getRecords().stream().map(a -> {
+            cn.fzu.edu.furever_home.animal.dto.AnimalPublicDTO d = new cn.fzu.edu.furever_home.animal.dto.AnimalPublicDTO();
+            d.setAnimalId(a.getAnimalId());
+            d.setUserId(a.getUserId());
+            d.setAnimalName(a.getAnimalName());
+            d.setPhotoUrls(a.getPhotoUrls());
+            d.setSpecies(a.getSpecies());
+            d.setBreed(a.getBreed());
+            d.setGender(a.getGender());
+            d.setAnimalAge(a.getAnimalAge());
+            d.setHealthStatus(a.getHealthStatus());
+            d.setIsSterilized(a.getIsSterilized());
+            d.setAdoptionStatus(a.getAdoptionStatus());
+            d.setShortDescription(a.getShortDescription());
+            return d;
+        }).toList();
+        return new PageResult<>(result.getCurrent(), result.getSize(), result.getTotal(), records);
     }
 }

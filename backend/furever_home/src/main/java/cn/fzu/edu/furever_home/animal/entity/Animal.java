@@ -4,18 +4,22 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import cn.fzu.edu.furever_home.common.enums.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
-@TableName("animal")
+@TableName(value = "animal", autoResultMap = true)
 public class Animal {
     @TableId(value = "animal_id", type = IdType.AUTO)
     private Integer animalId;
     private Integer userId;
     private String animalName;
-    private String photoUrls;
+    @TableField(value = "photo_urls", typeHandler = JacksonTypeHandler.class)
+    private List<String> photoUrls;
     private Species species;
     private String breed;
     private Gender gender;

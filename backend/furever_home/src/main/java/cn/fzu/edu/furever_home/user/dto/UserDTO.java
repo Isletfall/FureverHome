@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import cn.fzu.edu.furever_home.common.enums.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Schema(name = "用户信息", description = "用户资料DTO")
@@ -25,8 +26,8 @@ public class UserDTO {
     private String location;
     @Schema(description = "资质说明")
     private String proofText;
-    @Schema(description = "资质图片链接")
-    private String proofPhoto;
+    @Schema(description = "资质图片URL列表（JSON数组）", example = "[\"https://img.example.com/p1.jpg\",\"https://img.example.com/p2.jpg\"]")
+    private List<String> proofPhoto;
     @Schema(description = "信用分")
     private Double creditScore;
     @Schema(description = "评分次数")

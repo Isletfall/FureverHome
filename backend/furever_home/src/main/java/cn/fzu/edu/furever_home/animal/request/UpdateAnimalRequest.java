@@ -6,14 +6,16 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Schema(name = "UpdateAnimalRequest", description = "更新动物信息请求体")
 public class UpdateAnimalRequest {
     @Schema(description = "动物名字")
     @Size(max = 50)
     private String animalName;
-    @Schema(description = "动物照片（图片链接）")
-    private String photoUrls;
+    @Schema(description = "动物照片URL列表（JSON数组）", example = "[\"https://img.example.com/a.jpg\",\"https://img.example.com/b.jpg\"]")
+    private List<String> photoUrls;
     @Schema(description = "动物种类")
     private Species species;
     @Schema(description = "动物品种")

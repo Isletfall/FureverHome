@@ -8,4 +8,6 @@ public interface AdoptService {
     Integer submit(Integer userId, SubmitAdoptRequest req);
     AdoptDTO getById(Integer id);
     void review(Integer id, ApplicationStatus status);
+    java.util.List<cn.fzu.edu.furever_home.adopt.entity.Adopt> listByAnimalOwner(Integer ownerUserId);
+    java.util.List<cn.fzu.edu.furever_home.adopt.entity.Adopt> listByApplicant(Integer applicantUserId);
 }

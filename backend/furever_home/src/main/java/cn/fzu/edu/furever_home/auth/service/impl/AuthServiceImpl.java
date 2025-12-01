@@ -49,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
                 .or()
                 .eq(User::getUserName, account);
         List<User> userList = userMapper.selectList(qw);
-//        log.info(userList.toString());
+        // log.info(userList.toString());
         if (CollectionUtils.isEmpty(userList)) {
             return null;
         }
@@ -89,11 +89,7 @@ public class AuthServiceImpl implements AuthService {
         u.setUserName(userName);
         u.setEmail(email);
         u.setPasswordHash(encoder.encode(rawPassword));
-        u.setUserAge(18);
-        u.setSex(Sex.valueOf("男"));
-        u.setStatus(UserStatus.valueOf("正常"));
-        //u.setSex(Sex.MALE);
-        //u.setStatus(UserStatus.NORMAL);
+        u.setStatus(UserStatus.NORMAL);
         u.setCreateTime(LocalDateTime.now());
         u.setUpdatedAt(LocalDateTime.now());
         try {
