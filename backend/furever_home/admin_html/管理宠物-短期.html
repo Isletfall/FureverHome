@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html class="light" lang="zh">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FUREVER HOME 管理后台 - 已发布的短期宠物</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+<style>
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+  }
+</style>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          primary: '#1152d4',
+          'background-light': '#f6f6f8',
+          'background-dark': '#101622',
+        },
+        fontFamily: {
+          display: ['Inter', 'sans-serif'],
+        },
+        borderRadius: {
+          DEFAULT: '0.25rem',
+          lg: '0.5rem',
+          xl: '0.75rem',
+          full: '9999px',
+        },
+      },
+    },
+  };
+</script>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+<div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="flex h-full grow flex-row">
+<aside class="flex h-screen w-64 flex-col bg-[#0D1117] p-4 text-white sticky top-0">
+<div class="flex flex-1 flex-col gap-y-6">
+<div class="flex gap-4 items-center pl-2">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-md size-10" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCXgIEGQDxm_-u0_hGh3zLMrnSopanRetl40eBEzEZK5EuAzmRBjLSoHvTfChZUsRxhl-VkmKERbA8dzEfmZ0Lc7Eknq3IrtFS8nTd7yOq--6qN8nThXknq4Dc7yuS2F6JRnn0Lq5TvGd9eOQu1tCT8pzt3mINpyWwQjwcdAyj-0i0GbYn-BjJJ1TbMLXrWmMWqHYUTnao2jcQCpqu5SM6X3Kus-jTK34uXpMPa8s692RkVoKXgYaZqCNN-QAj1pjmnT34bKsjYDgI");'></div>
+<h1 class="text-white text-base font-bold leading-normal">FUREVER HOME 管理后台</h1>
+</div>
+<nav class="flex flex-col gap-2 mt-4">
+<a class="flex items-center gap-4 px-4 py-2.5 rounded-lg text-gray-400 hover:bg-white/10 hover:text-white" href="首页.html"><span class="material-symbols-outlined" style="font-size:24px;">grid_view</span><p class="text-sm font-medium">首页</p></a>
+<a class="flex items-center gap-4 px-4 py-2.5 rounded-lg text-gray-400 hover:bg-white/10 hover:text-white" href="管理帖子-待审核.html"><span class="material-symbols-outlined" style="font-size:24px;">article</span><p class="text-sm font-medium">帖子管理</p></a>
+<a class="flex items-center gap-4 px-4 py-2.5 rounded-lg bg-[#2563EB]" href="#"><span class="material-symbols-outlined text-white" style="font-size:24px;">pets</span><p class="text-sm font-medium text-white">宠物管理</p></a>
+<a class="flex items-center gap-4 px-4 py-2.5 rounded-lg text-gray-400 hover:bg-white/10 hover:text-white" href="管理申请.html"><span class="material-symbols-outlined" style="font-size:24px;">assignment</span><p class="text-sm font-medium">申请管理</p></a>
+</nav>
+</div>
+<div class="mt-auto flex flex-col"><a class="flex items-center gap-4 px-4 py-2.5 rounded-lg text-gray-400 hover:bg-white/10 hover:text-white" href="#"><span class="material-symbols-outlined" style="font-size:24px;">logout</span><p class="text-sm font-medium leading-normal">退出登录</p></a></div>
+</aside>
+<main class="flex-1 p-8 space-y-6">
+<header>
+<h1 class="text-[#111318] dark:text-white text-3xl font-bold leading-tight tracking-[-0.033em]">管理宠物</h1>
+</header>
+<section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="bg-white dark:bg-[#181C25] rounded-xl border border-gray-100 dark:border-gray-800 p-5">
+<p class="text-sm text-gray-500 dark:text-gray-400">短期宠物</p>
+<div class="flex items-end justify-between">
+<h3 class="text-3xl font-semibold text-[#111318] dark:text-white">48</h3>
+</div>
+</div>
+<div class="bg-white dark:bg-[#181C25] rounded-xl border border-gray-100 dark:border-gray-800 p-5">
+<p class="text-sm text-gray-500 dark:text-gray-400">长期宠物</p>
+<div class="flex items-end justify-between">
+<h3 class="text-3xl font-semibold text-[#111318] dark:text-white">32</h3>
+</div>
+</div>
+<div class="bg-white dark:bg-[#181C25] rounded-xl border border-gray-100 dark:border-gray-800 p-5">
+<p class="text-sm text-gray-500 dark:text-gray-400">待审核短期</p>
+<div class="flex items-end justify-between">
+<h3 class="text-3xl font-semibold text-[#111318] dark:text-white">9</h3>
+</div>
+</div>
+</section>
+<section class="bg-white dark:bg-[#181C25] rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
+<div class="flex flex-wrap border-b border-gray-100 dark:border-gray-800 text-sm font-medium">
+<a class="py-4 px-6 text-gray-500 border-b-2 border-transparent hover:text-primary" href="管理宠物-待审核短期.html">待审核的短期宠物列表</a>
+<a class="py-4 px-6 text-primary border-b-2 border-primary" href="管理宠物-短期.html">已发布的短期宠物列表</a>
+<a class="py-4 px-6 text-gray-500 border-b-2 border-transparent hover:text-primary" href="管理宠物-长期.html">已发布的长期宠物列表</a>
+</div>
+<div id="shortTerm-tab" class="pet-tab">
+<div class="p-5 flex flex-wrap gap-4 justify-between items-center border-b border-gray-100 dark:border-gray-800">
+<div class="relative">
+<input type="text" placeholder="搜索短期宠物..." class="pl-10 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/40" />
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+</div>
+</div>
+<div id="shortTerm-list" class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-5 p-5"></div>
+<div class="flex flex-wrap items-center justify-between gap-4 border-t border-gray-100 dark:border-gray-800 p-5">
+<p class="text-sm text-gray-500 dark:text-gray-400" id="shortTerm-info">显示 0 到 0 条，共 0 条</p>
+<div class="flex gap-2" id="shortTerm-pagination"></div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</div>
+<script>
+const PAGE_SIZE = 10;
+let currentPage = 1;
+const namePool = ['小橘', '团团', '贝贝', '星星', '雪糕', '可可', '奶茶', '闪电', '木木', '花花'];
+const categoryPool = ['猫  英短', '狗  拉布拉多', '猫  布偶', '狗  柯基', '猫  暹罗', '狗  萨摩耶'];
+const adopterPool = ['李同学', '张老师', '王阿姨', '陈小姐', '刘先生', '赵女士', '钱工程师'];
+
+const shortTermPets = Array.from({ length: 28 }, (_, i) => ({
+  id: 3201 + i,
+  name: namePool[i % namePool.length],
+  category: categoryPool[i % categoryPool.length],
+  adopter: adopterPool[i % adopterPool.length],
+  duration: `${4 + (i % 15)} 天`
+}));
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderList(1);
+});
+
+function renderList(page) {
+  const total = shortTermPets.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  currentPage = Math.max(1, Math.min(page, totalPages));
+
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const end = Math.min(start + PAGE_SIZE, total);
+  const current = shortTermPets.slice(start, end);
+
+  const list = document.getElementById('shortTerm-list');
+  list.innerHTML = current.map(pet => `
+    <div class="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1C202B] shadow-sm p-5 flex flex-col gap-4">
+      <span class="px-2 py-1 rounded-full text-xs bg-primary/10 text-primary">#${pet.id}</span>
+      <div class="rounded-xl bg-gradient-to-br from-indigo-100 to-indigo-200 dark:from-indigo-900/30 dark:to-indigo-800/30 w-full h-28 flex items-center justify-center text-indigo-600 dark:text-indigo-200 text-sm font-semibold">
+        ${pet.name} 的照片
+      </div>
+      <div class="flex items-center gap-3">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">${pet.name}</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">${pet.category}</p>
+        </div>
+      </div>
+      <div class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+        <div class="flex items-center gap-3">
+          <p class="text-xs text-gray-500 dark:text-gray-400">短期领养者</p>
+          <div>
+            <p class="text-gray-900 dark:text-white">${pet.adopter}</p>
+          </div>
+        </div>
+        <p class="text-xs text-gray-500 dark:text-gray-400">已领养时长：${pet.duration}</p>
+      </div>
+      <div class="flex items-center gap-2 justify-end">
+        <button title="删除" class="inline-flex items-center justify-center rounded-full size-9 border border-transparent text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30"><span class="material-symbols-outlined">delete</span></button>
+        <button title="查看详情" class="inline-flex items-center justify-center rounded-full size-9 border border-transparent text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30"><span class="material-symbols-outlined">visibility</span></button>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('shortTerm-info').textContent = `显示 ${total ? start + 1 : 0} 到 ${end} 条，共 ${total} 条`;
+  renderPagination(totalPages);
+}
+
+function renderPagination(totalPages) {
+  const container = document.getElementById('shortTerm-pagination');
+  container.innerHTML = '';
+  container.appendChild(createPagerButton('上一页', currentPage === 1, () => renderList(currentPage - 1)));
+  const startPage = Math.max(1, currentPage - 2);
+  const endPage = Math.min(totalPages, startPage + 4);
+  for (let i = startPage; i <= endPage; i++) {
+    const pageBtn = createPagerButton(i, false, () => renderList(i));
+    if (i === currentPage) {
+      pageBtn.classList.add('bg-primary', 'text-white', 'border-primary');
+      pageBtn.classList.remove('text-gray-700', 'dark:text-gray-300');
+    }
+    container.appendChild(pageBtn);
+  }
+  container.appendChild(createPagerButton('下一页', currentPage === totalPages, () => renderList(currentPage + 1)));
+}
+
+function createPagerButton(label, disabled, handler) {
+  const btn = document.createElement('button');
+  btn.textContent = label;
+  btn.className = 'px-3 py-1 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed';
+  btn.disabled = disabled;
+  if (!disabled) btn.onclick = handler;
+  return btn;
+}
+</script>
+</body>
+</html>
+

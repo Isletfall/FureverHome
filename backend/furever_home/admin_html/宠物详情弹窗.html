@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html class="light" lang="zh">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>宠物详情弹窗</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body class="bg-slate-900/70 min-h-screen flex items-center justify-center p-4">
+<div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm"></div>
+<div class="relative z-10 w-full max-w-4xl">
+  <div class="rounded-2xl bg-white shadow-2xl dark:bg-[#1A1E26]">
+    <div class="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 px-6 py-4">
+      <div>
+        <h2 class="text-2xl font-bold text-slate-900 dark:text-white">宠物详情</h2>
+      </div>
+      <button class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition">
+        <span class="material-symbols-outlined text-2xl">close</span>
+      </button>
+    </div>
+    <div class="px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="space-y-4">
+        <div class="rounded-2xl overflow-hidden h-64 bg-slate-100 dark:bg-slate-800">
+          <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=900&q=60" alt="宠物头像" class="h-full w-full object-cover"/>
+        </div>
+        <div class="grid grid-cols-4 gap-3">
+          <img class="h-20 rounded-xl object-cover" src="https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&w=400&q=60" alt="pet gallery 1"/>
+          <img class="h-20 rounded-xl object-cover" src="https://images.unsplash.com/photo-1507143550189-fed454f93097?auto=format&fit=crop&w=400&q=60" alt="pet gallery 2"/>
+          <img class="h-20 rounded-xl object-cover" src="https://images.unsplash.com/photo-1546443046-ed1ce6ffd1b7?auto=format&fit=crop&w=400&q=60" alt="pet gallery 3"/>
+          <div class="h-20 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 text-sm">+5</div>
+        </div>
+      </div>
+      <div class="space-y-5">
+        <div>
+          <h3 class="text-2xl font-semibold text-slate-900 dark:text-white">小橘 · 英短</h3>
+        </div>
+        <div class="grid grid-cols-2 gap-4 text-sm text-slate-600 dark:text-slate-300">
+          <div>
+            <p class="text-xs uppercase tracking-wide text-slate-400">类别</p>
+            <p class="mt-1 font-medium">猫咪</p>
+          </div>
+          <div>
+            <p class="text-xs uppercase tracking-wide text-slate-400">品种</p>
+            <p class="mt-1 font-medium">英国短毛猫</p>
+          </div>
+          <div>
+            <p class="text-xs uppercase tracking-wide text-slate-400">性别</p>
+            <p class="mt-1 font-medium">母</p>
+          </div>
+          <div>
+            <p class="text-xs uppercase tracking-wide text-slate-400">年龄</p>
+            <p class="mt-1 font-medium">1 岁 3 个月</p>
+          </div>
+          <div>
+            <p class="text-xs uppercase tracking-wide text-slate-400">绝育</p>
+            <p class="mt-1 font-medium">已绝育</p>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <p class="text-xs uppercase tracking-wide text-slate-400">宠物简介</p>
+          <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+            小橘性格温柔粘人，喜欢与人互动，能够很好地适应室内生活。对于陌生环境有短暂适应期，
+            目前饮食正常，已经习惯使用猫砂盆，适合安静稳定的家庭。
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center justify-end gap-3 border-t border-slate-100 dark:border-slate-800 px-6 py-4">
+      <button class="px-4 py-2 rounded-lg text-slate-500 hover:text-slate-700 border border-slate-200 dark:border-slate-700">关闭</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+

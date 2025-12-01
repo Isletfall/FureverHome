@@ -92,6 +92,8 @@ public class AuthServiceImpl implements AuthService {
         u.setUserAge(18);
         u.setSex(Sex.valueOf("男"));
         u.setStatus(UserStatus.valueOf("正常"));
+        //u.setSex(Sex.MALE);
+        //u.setStatus(UserStatus.NORMAL);
         u.setCreateTime(LocalDateTime.now());
         u.setUpdatedAt(LocalDateTime.now());
         try {

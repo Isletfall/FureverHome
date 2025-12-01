@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html class="light" lang="zh">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>帖子详情弹窗</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body class="bg-slate-900/70 min-h-screen flex items-center justify-center p-4">
+<div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm"></div>
+<div class="relative z-10 w-full max-w-3xl">
+  <div class="rounded-2xl bg-white dark:bg-[#1A1E26] shadow-2xl">
+    <div class="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 px-6 py-4">
+      <div>
+        <h2 class="text-2xl font-bold text-slate-900 dark:text-white">帖子详情</h2>
+      </div>
+      <button class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition">
+        <span class="material-symbols-outlined text-2xl">close</span>
+      </button>
+    </div>
+    <div class="px-6 py-6 space-y-6">
+      <div class="flex items-center gap-4">
+        <div class="size-16 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold">
+          头像
+        </div>
+        <div>
+          <p class="text-base font-semibold text-slate-900 dark:text-white">陈晨</p>
+          <p class="text-sm text-slate-500 dark:text-slate-400">发布于 2023-07-18 10:24</p>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <h3 class="text-xl font-semibold text-slate-900 dark:text-white">城市救助记录 · 小黄的故事</h3>
+        <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+          我们在旧城区发现了受伤的小黄，它当时腿部受伤无法行走。经过志愿者的紧急救治，目前已经稳定。
+          帖子中详细记录了救助过程、医疗费用以及后续的领养诉求，欢迎更多爱心人士关注它的康复。
+        </p>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <img class="rounded-xl object-cover w-full h-48" src="https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&fit=crop&w=800&q=60" alt="post image 1"/>
+        <img class="rounded-xl object-cover w-full h-48" src="https://images.unsplash.com/photo-1507143550189-fed454f93097?auto=format&fit=crop&w=800&q=60" alt="post image 2"/>
+      </div>
+      <!-- 评论列表 -->
+      <div class="space-y-4 border-t border-slate-100 dark:border-slate-800 pt-6">
+        <h4 class="text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+          <span class="material-symbols-outlined text-lg">chat</span>评论 (3)
+        </h4>
+        <ul class="space-y-4 max-h-64 overflow-y-auto pr-2">
+          <li class="flex gap-3">
+            <div class="size-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-medium shrink-0">头像</div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium text-slate-900 dark:text-white">李明</span>
+                <span class="text-xs text-slate-400">2023-07-18 11:02</span>
+              </div>
+              <p class="text-sm text-slate-600 dark:text-slate-300 mt-1">小黄加油！希望早日康复找到新家。</p>
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <div class="size-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs font-medium shrink-0">头像</div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium text-slate-900 dark:text-white">王芳</span>
+                <span class="text-xs text-slate-400">2023-07-18 12:35</span>
+              </div>
+              <p class="text-sm text-slate-600 dark:text-slate-300 mt-1">已转发朋友圈，希望能帮到它！</p>
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <div class="size-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-medium shrink-0">头像</div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium text-slate-900 dark:text-white">张伟</span>
+                <span class="text-xs text-slate-400">2023-07-18 14:20</span>
+              </div>
+              <p class="text-sm text-slate-600 dark:text-slate-300 mt-1">请问医疗费用可以通过什么渠道捐助？</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="flex items-center justify-end gap-3 border-t border-slate-100 dark:border-slate-800 px-6 py-4">
+      <button class="px-4 py-2 rounded-lg text-slate-500 hover:text-slate-700 border border-slate-200 dark:border-slate-700">关闭</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+
