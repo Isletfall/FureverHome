@@ -22,7 +22,7 @@ public class AdminDashboardController {
 
     @GetMapping("/statistics")
     @Operation(summary = "获取管理后台首页统计数据")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer xxxxxx")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = true, example = "Bearer {{token}}")
     public Result<DashboardStatisticsDTO> statistics() {
         DashboardStatisticsDTO statistics = adminDashboardService.getStatistics();
         return Result.success(statistics);

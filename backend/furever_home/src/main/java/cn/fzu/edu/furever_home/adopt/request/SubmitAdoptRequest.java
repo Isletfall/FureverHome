@@ -1,9 +1,7 @@
 package cn.fzu.edu.furever_home.adopt.request;
 
-import cn.fzu.edu.furever_home.common.enums.HouseType;
-import cn.fzu.edu.furever_home.common.enums.LivingEnvironment;
+import cn.fzu.edu.furever_home.common.enums.*;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -16,34 +14,38 @@ public class SubmitAdoptRequest {
     @Schema(description = "动物ID")
     private Integer animalId;
 
-    @NotNull
-    @Schema(description = "居住环境")
-    private LivingEnvironment livingEnvironment;
+    @NotBlank
+    @Size(max = 50)
+    @Schema(description = "申请人姓名")
+    private String userName;
 
-    @NotNull
-    @Schema(description = "房屋产权")
-    private HouseType houseType;
+    @NotBlank
+    @Size(max = 50)
+    @Schema(description = "申请人邮箱")
+    private String email;
 
-    @NotNull
-    @Schema(description = "是否有其他宠物")
-    private Boolean hasOtherPets;
+    @NotBlank
+    @Size(max = 50)
+    @Schema(description = "申请人电话")
+    private String phone;
 
-    @NotNull
-    @Min(1)
-    @Schema(description = "家庭成员数量")
-    private Integer familyMemberCount;
+    @NotBlank
+    @Size(max = 50)
+    @Schema(description = "所在省")
+    private String province;
 
-    @NotNull
-    @Schema(description = "是否有小孩")
-    private Boolean hasChild;
+    @NotBlank
+    @Size(max = 50)
+    @Schema(description = "所在市")
+    private String city;
+
+    @NotBlank
+    @Size(max = 1000)
+    @Schema(description = "居住地址")
+    private String livingLocation;
 
     @NotBlank
     @Size(max = 1000)
     @Schema(description = "领养原因")
     private String adoptReason;
-
-    @NotNull
-    @Min(1)
-    @Schema(description = "月收入")
-    private Integer monthSalary;
 }

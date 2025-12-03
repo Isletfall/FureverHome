@@ -3,6 +3,7 @@ package cn.fzu.edu.furever_home.animal.controller;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.fzu.edu.furever_home.animal.dto.AnimalDTO;
+import cn.fzu.edu.furever_home.animal.dto.AnimalPublicDTO;
 import cn.fzu.edu.furever_home.animal.request.CreateAnimalRequest;
 import cn.fzu.edu.furever_home.animal.request.UpdateAnimalRequest;
 import cn.fzu.edu.furever_home.animal.service.AnimalService;
@@ -27,16 +28,33 @@ public class AnimalController {
 
     @GetMapping("/list")
     @Operation(summary = "获取动物列表")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
-    public Result<PageResult<AnimalDTO>> list(@RequestParam(defaultValue = "1") int page,
-                                              @RequestParam(defaultValue = "20") int pageSize) {
-        PageResult<AnimalDTO> data = animalService.pageAll(page, pageSize);
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
+    public Result<PageResult<AnimalPublicDTO>> list(@RequestParam(defaultValue = "1") int page,
+                                                    @RequestParam(defaultValue = "20") int pageSize,
+                                                    @RequestParam(required = false) String province,
+                                                    @RequestParam(required = false) String city,
+                                                    @RequestParam(required = false) cn.fzu.edu.furever_home.common.enums.Species species,
+                                                    @RequestParam(required = false) cn.fzu.edu.furever_home.common.enums.Gender gender,
+                                                    @RequestParam(required = false, name = "age") String ageRange,
+                                                    @RequestParam(required = false) cn.fzu.edu.furever_home.common.enums.AdoptionStatus adoptionStatus) {
+        Integer minAge = null;
+        Integer maxAge = null;
+        if (ageRange != null && !ageRange.isBlank()) {
+            String[] parts = ageRange.split("-");
+            if (parts.length == 2) {
+                if (!parts[0].isBlank()) minAge = Integer.parseInt(parts[0]);
+                if (!parts[1].isBlank()) maxAge = Integer.parseInt(parts[1]);
+            } else if (parts.length == 1) {
+                minAge = Integer.parseInt(parts[0]);
+            }
+        }
+        PageResult<cn.fzu.edu.furever_home.animal.dto.AnimalPublicDTO> data = animalService.pageAllPublic(page, pageSize, province, city, species, gender, minAge, maxAge, adoptionStatus);
         return Result.success(data);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "获取动物详情")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
     public Result<AnimalDTO> detail(@Parameter(description = "动物ID") @PathVariable Integer id) {
         Integer uid = StpUtil.getLoginIdAsInt();
         AnimalDTO dto = animalService.getById(id, uid);
@@ -46,7 +64,7 @@ public class AnimalController {
     @PostMapping
     @SaCheckPermission("animal:create")
     @Operation(summary = "发布动物信息")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
     public Result<Integer> create(@RequestBody @Valid CreateAnimalRequest req) {
         Integer uid = StpUtil.getLoginIdAsInt();
         Integer id = animalService.create(uid, req);
@@ -56,7 +74,7 @@ public class AnimalController {
     @PutMapping("/{id}")
     @SaCheckPermission("animal:create")
     @Operation(summary = "更新动物信息")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
     public Result<Void> update(@Parameter(description = "动物ID") @PathVariable Integer id, @RequestBody @Valid UpdateAnimalRequest req) {
         Integer uid = StpUtil.getLoginIdAsInt();
         animalService.update(uid, id, req);
@@ -66,7 +84,7 @@ public class AnimalController {
     @DeleteMapping("/{id}")
     @SaCheckPermission("animal:create")
     @Operation(summary = "删除动物信息")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
     public Result<Void> delete(@Parameter(description = "动物ID") @PathVariable Integer id) {
         Integer uid = StpUtil.getLoginIdAsInt();
         animalService.delete(uid, id);
@@ -75,7 +93,7 @@ public class AnimalController {
 
     @GetMapping("/mine/short")
     @Operation(summary = "获取我的短期宠物列表")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
     public Result<PageResult<AnimalDTO>> myShort(@RequestParam(defaultValue = "1") int page,
                                                  @RequestParam(defaultValue = "20") int pageSize) {
         Integer uid = cn.dev33.satoken.stp.StpUtil.getLoginIdAsInt();
@@ -85,7 +103,7 @@ public class AnimalController {
 
     @GetMapping("/mine/long")
     @Operation(summary = "获取我的长期宠物列表")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
     public Result<PageResult<AnimalDTO>> myLong(@RequestParam(defaultValue = "1") int page,
                                                 @RequestParam(defaultValue = "20") int pageSize) {
         Integer uid = cn.dev33.satoken.stp.StpUtil.getLoginIdAsInt();

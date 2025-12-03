@@ -38,7 +38,7 @@ public class AdoptController {
     @PostMapping
     @SaCheckPermission("adopt:apply")
     @Operation(summary = "提交领养申请")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
     public Result<Integer> submit(@RequestBody @Valid SubmitAdoptRequest req) {
         Integer uid = StpUtil.getLoginIdAsInt();
         Integer id = adoptService.submit(uid, req);
@@ -48,7 +48,7 @@ public class AdoptController {
     @GetMapping("/{id}")
     @SaCheckPermission("adopt:read")
     @Operation(summary = "获取领养申请详情")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
     public Result<AdoptDTO> detail(@Parameter(description = "领养申请ID") @PathVariable Integer id) {
         AdoptDTO dto = adoptService.getById(id);
         return Result.success(dto);
@@ -57,7 +57,7 @@ public class AdoptController {
     @PostMapping("/{id}/review")
     @SaCheckPermission("adopt:review")
     @Operation(summary = "审核领养申请")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
     public Result<Void> review(@Parameter(description = "领养申请ID") @PathVariable Integer id, @RequestBody @Valid ReviewAdoptRequest req) {
         adoptService.review(id, req.getApplicationStatus());
         return Result.success();
@@ -66,7 +66,7 @@ public class AdoptController {
     @GetMapping("/todo")
     @SaCheckPermission("adopt:read")
     @Operation(summary = "获取我的待办（别人对我的申请）列表")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
     public Result<java.util.List<java.util.Map<String, Object>>> myTodo() {
         Integer uid = StpUtil.getLoginIdAsInt();
         java.util.List<cn.fzu.edu.furever_home.adopt.entity.Adopt> adopts = adoptService.listByAnimalOwner(uid);
@@ -93,7 +93,7 @@ public class AdoptController {
     @GetMapping("/mine")
     @SaCheckPermission("adopt:read")
     @Operation(summary = "获取我的申请列表")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
     public Result<List<Map<String, Object>>> myApplications() {
         Integer uid = StpUtil.getLoginIdAsInt();
         List<Adopt> adopts = adoptService.listByApplicant(uid);

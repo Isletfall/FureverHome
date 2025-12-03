@@ -2,6 +2,9 @@ package cn.fzu.edu.furever_home.auth.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.SaTokenInfo;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import cn.fzu.edu.furever_home.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,14 +28,20 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(summary = "登录", description = "使用昵称或邮箱加密码登录")
-    public Result<SaTokenInfo> login(@RequestBody @Valid LoginRequest req) {
+    public Result<Map<String, Object>> login(@RequestBody @Valid LoginRequest req) {
         User u = authService.findByAccount(req.getAccount());
         if (u == null)
             return Result.error(401, "账户不存在");
         if (!authService.matches(req.getPassword(), u.getPasswordHash()))
             return Result.error(401, "密码错误");
         StpUtil.login(u.getUserId());
-        return Result.success("登录成功", StpUtil.getTokenInfo());
+        SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+        List<String> roles = StpUtil.getRoleList(u.getUserId());
+        Map<String, Object> data = new HashMap<>();
+        data.put("tokenInfo", tokenInfo);
+        data.put("roles", roles);
+        data.put("userName", u.getUserName());
+        return Result.success("登录成功", data);
     }
 
     @PostMapping("/logout")

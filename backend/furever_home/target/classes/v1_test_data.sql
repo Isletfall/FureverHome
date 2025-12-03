@@ -77,7 +77,7 @@ LIMIT 2;
 -- ============================================
 
 -- 生成长期宠物（已通过审核，10条）
-INSERT INTO animal (user_id, animal_name, photo_urls, species, breed, gender, animal_age, health_status, is_sterilized, adoption_status, short_description, review_status, created_at)
+INSERT INTO animal (user_id, animal_name, photo_urls, species, breed, gender, animal_age, health_status, is_sterilized, adoption_status, short_description, contact_phone, current_location, contact_email, current_province, current_city, review_status, created_at)
 SELECT 
     u.user_id,
     CASE (n.n % 10)
@@ -119,6 +119,11 @@ SELECT
     CASE (n.n % 3) WHEN 0 THEN '是' WHEN 1 THEN '否' ELSE '未知' END as is_sterilized,
     '长期领养' as adoption_status,
     CONCAT('这是一只可爱的宠物，性格温顺，适合家庭领养。') as short_description,
+    '13800000000' as contact_phone,
+    u.location as current_location,
+    u.email as contact_email,
+    CASE u.location WHEN '福州' THEN '福建省' WHEN '厦门' THEN '福建省' WHEN '泉州' THEN '福建省' ELSE NULL END as current_province,
+    u.location as current_city,
     '通过' as review_status,
     DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 60) DAY) as created_at
 FROM users u
@@ -130,7 +135,7 @@ WHERE u.user_name IN ('alice', 'bob')
 LIMIT 10;
 
 -- 生成短期宠物（已通过审核，5条）
-INSERT INTO animal (user_id, animal_name, photo_urls, species, breed, gender, animal_age, health_status, is_sterilized, adoption_status, short_description, review_status, created_at)
+INSERT INTO animal (user_id, animal_name, photo_urls, species, breed, gender, animal_age, health_status, is_sterilized, adoption_status, short_description, contact_phone, current_location, contact_email, current_province, current_city, review_status, created_at)
 SELECT 
     u.user_id,
     CASE (n.n % 10)
@@ -172,6 +177,11 @@ SELECT
     CASE (n.n % 3) WHEN 0 THEN '是' WHEN 1 THEN '否' ELSE '未知' END as is_sterilized,
     '短期领养' as adoption_status,
     CONCAT('这是一只可爱的宠物，适合短期寄养。') as short_description,
+    '13800000000' as contact_phone,
+    u.location as current_location,
+    u.email as contact_email,
+    CASE u.location WHEN '福州' THEN '福建省' WHEN '厦门' THEN '福建省' WHEN '泉州' THEN '福建省' ELSE NULL END as current_province,
+    u.location as current_city,
     '通过' as review_status,
     DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 30) DAY) as created_at
 FROM users u
@@ -183,7 +193,7 @@ LIMIT 5;
 
 -- 生成待审核的宠物（3条：2条短期 + 1条长期）
 -- 待审核的短期宠物（2条）
-INSERT INTO animal (user_id, animal_name, photo_urls, species, breed, gender, animal_age, health_status, is_sterilized, adoption_status, short_description, review_status, created_at)
+INSERT INTO animal (user_id, animal_name, photo_urls, species, breed, gender, animal_age, health_status, is_sterilized, adoption_status, short_description, contact_phone, current_location, contact_email, current_province, current_city, review_status, created_at)
 SELECT 
     u.user_id,
     CASE (n.n % 5)
@@ -202,6 +212,11 @@ SELECT
     '是' as is_sterilized,
     '短期领养' as adoption_status,
     CONCAT('待审核的短期领养宠物，等待管理员审核。') as short_description,
+    '13800000000' as contact_phone,
+    u.location as current_location,
+    u.email as contact_email,
+    CASE u.location WHEN '福州' THEN '福建省' WHEN '厦门' THEN '福建省' WHEN '泉州' THEN '福建省' ELSE NULL END as current_province,
+    u.location as current_city,
     '待审核' as review_status,
     DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 3) DAY) as created_at
 FROM users u
@@ -210,7 +225,7 @@ WHERE u.user_name IN ('alice', 'bob')
 LIMIT 2;
 
 -- 待审核的长期宠物（1条）
-INSERT INTO animal (user_id, animal_name, photo_urls, species, breed, gender, animal_age, health_status, is_sterilized, adoption_status, short_description, review_status, created_at)
+INSERT INTO animal (user_id, animal_name, photo_urls, species, breed, gender, animal_age, health_status, is_sterilized, adoption_status, short_description, contact_phone, current_location, contact_email, current_province, current_city, review_status, created_at)
 SELECT 
     u.user_id,
     '小橘' as animal_name,
@@ -223,6 +238,11 @@ SELECT
     '是' as is_sterilized,
     '长期领养' as adoption_status,
     '待审核的长期领养宠物，等待管理员审核。' as short_description,
+    '13800000000' as contact_phone,
+    u.location as current_location,
+    u.email as contact_email,
+    CASE u.location WHEN '福州' THEN '福建省' WHEN '厦门' THEN '福建省' WHEN '泉州' THEN '福建省' ELSE NULL END as current_province,
+    u.location as current_city,
     '待审核' as review_status,
     DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 3) DAY) as created_at
 FROM users u
@@ -234,21 +254,25 @@ LIMIT 1;
 -- ============================================
 
 -- 生成已通过的申请（8条）
-INSERT INTO adopt (animal_id, user_id, application_status, review_status, living_environment, house_type, has_other_pets, family_member_count, has_child, adopt_reason, month_salary, create_time, pass_time)
+INSERT INTO adopt (animal_id, user_id, user_name, phone, email, application_status, review_status, province, city, living_location, adopt_reason, create_time, pass_time)
 SELECT 
     a.animal_id,
     u.user_id,
+    u.user_name,
+    '13800000000' as phone,
+    u.email,
     CASE ((a.animal_id + u.user_id) % 3) WHEN 0 THEN '申请中' WHEN 1 THEN '申请成功' ELSE '申请失败' END as application_status,
     '通过' as review_status,
-    CASE ((a.animal_id + u.user_id) % 4) WHEN 0 THEN '宿舍' WHEN 1 THEN '公寓' WHEN 2 THEN '别墅' ELSE '其他' END as living_environment,
-    CASE ((a.animal_id + u.user_id) % 2) WHEN 0 THEN '拥有' ELSE '租用' END as house_type,
-    CASE ((a.animal_id + u.user_id) % 2) WHEN 0 THEN TRUE ELSE FALSE END as has_other_pets,
-    FLOOR(1 + RAND() * 5) as family_member_count,
-    CASE ((a.animal_id + u.user_id) % 3) WHEN 0 THEN TRUE ELSE FALSE END as has_child,
-    CONCAT('非常喜欢宠物，有稳定的收入和充足的时间照顾。') as adopt_reason,
-    FLOOR(5000 + RAND() * 15000) as month_salary,
+    CASE ((a.animal_id + u.user_id) % 3) WHEN 0 THEN '福建省' WHEN 1 THEN '浙江省' ELSE '广东省' END as province,
+    CASE ((a.animal_id + u.user_id) % 3) WHEN 0 THEN '福州市' WHEN 1 THEN '杭州市' ELSE '深圳市' END as city,
+    CONCAT(
+        CASE ((a.animal_id + u.user_id) % 4) WHEN 0 THEN '宿舍' WHEN 1 THEN '公寓' WHEN 2 THEN '别墅' ELSE '其他' END,
+        '-',
+        CASE ((a.animal_id + u.user_id) % 2) WHEN 0 THEN '拥有' ELSE '租用' END
+    ) as living_location,
+    '非常喜欢宠物，有稳定的收入和充足的时间照顾。' as adopt_reason,
     DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 30) DAY) as create_time,
-    DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 15) DAY) as pass_time
+    CASE ((a.animal_id + u.user_id) % 3) WHEN 1 THEN DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 15) DAY) ELSE NULL END as pass_time
 FROM animal a
 CROSS JOIN users u
 WHERE a.review_status = '通过'
@@ -262,19 +286,23 @@ WHERE a.review_status = '通过'
 LIMIT 8;
 
 -- 生成待审核的申请（2条）
-INSERT INTO adopt (animal_id, user_id, application_status, review_status, living_environment, house_type, has_other_pets, family_member_count, has_child, adopt_reason, month_salary, create_time)
+INSERT INTO adopt (animal_id, user_id, user_name, phone, email, application_status, review_status, province, city, living_location, adopt_reason, create_time)
 SELECT 
     a.animal_id,
     u.user_id,
+    u.user_name,
+    '13800000000' as phone,
+    u.email,
     '申请中' as application_status,
     '待审核' as review_status,
-    CASE ((a.animal_id + u.user_id) % 4) WHEN 0 THEN '宿舍' WHEN 1 THEN '公寓' WHEN 2 THEN '别墅' ELSE '其他' END as living_environment,
-    CASE ((a.animal_id + u.user_id) % 2) WHEN 0 THEN '拥有' ELSE '租用' END as house_type,
-    CASE ((a.animal_id + u.user_id) % 2) WHEN 0 THEN TRUE ELSE FALSE END as has_other_pets,
-    FLOOR(1 + RAND() * 4) as family_member_count,
-    CASE ((a.animal_id + u.user_id) % 3) WHEN 0 THEN TRUE ELSE FALSE END as has_child,
-    CONCAT('希望领养一只可爱的宠物，我会好好照顾它。') as adopt_reason,
-    FLOOR(6000 + RAND() * 12000) as month_salary,
+    CASE ((a.animal_id + u.user_id) % 3) WHEN 0 THEN '福建省' WHEN 1 THEN '浙江省' ELSE '广东省' END as province,
+    CASE ((a.animal_id + u.user_id) % 3) WHEN 0 THEN '福州市' WHEN 1 THEN '杭州市' ELSE '深圳市' END as city,
+    CONCAT(
+        CASE ((a.animal_id + u.user_id) % 4) WHEN 0 THEN '宿舍' WHEN 1 THEN '公寓' WHEN 2 THEN '别墅' ELSE '其他' END,
+        '-',
+        CASE ((a.animal_id + u.user_id) % 2) WHEN 0 THEN '拥有' ELSE '租用' END
+    ) as living_location,
+    '希望领养一只可爱的宠物，我会好好照顾它。' as adopt_reason,
     DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 7) DAY) as create_time
 FROM animal a
 CROSS JOIN users u

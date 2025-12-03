@@ -70,7 +70,7 @@ public class RatingServiceImpl implements RatingService {
         if (score == null || score < 1 || score > 5) throw new IllegalArgumentException("评分需在1-5之间");
         Rating exists = ratingMapper.selectOne(new LambdaQueryWrapper<Rating>().eq(Rating::getUserId, userId).eq(Rating::getTargetUserId, targetUserId));
         if (exists != null) {
-            throw new IllegalStateException("您对该用户已存在评价");
+            throw new IllegalStateException("已存在评价，请使用修改接口");
         }
         Rating r = new Rating();
         r.setUserId(userId);

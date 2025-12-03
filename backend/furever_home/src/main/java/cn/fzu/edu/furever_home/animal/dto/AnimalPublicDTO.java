@@ -24,12 +24,14 @@ public class AnimalPublicDTO {
     private Gender gender;
     @Schema(description = "年龄")
     private Integer animalAge;
-    @Schema(description = "健康状况")
-    private String healthStatus;
     @Schema(description = "是否绝育")
     private SterilizedStatus isSterilized;
     @Schema(description = "领养状态")
     private AdoptionStatus adoptionStatus;
     @Schema(description = "简短描述")
     private String shortDescription;
+    @Schema(description = "领养者名字")
+    private String adopterName;
+    @Schema(description = "暂时领养时间（天）")
+    private Integer adoptionDays;
 }

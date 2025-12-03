@@ -29,6 +29,11 @@ public class Animal {
     private AdoptionStatus adoptionStatus;
     private String shortDescription;
     private ReviewStatus reviewStatus;
+    private String contactPhone;
+    private String currentLocation;
+    private String contactEmail;
+    private String currentProvince;
+    private String currentCity;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

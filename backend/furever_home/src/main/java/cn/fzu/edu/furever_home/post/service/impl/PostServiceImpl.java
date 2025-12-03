@@ -2,13 +2,19 @@ package cn.fzu.edu.furever_home.post.service.impl;
 
 import cn.fzu.edu.furever_home.post.dto.PostDTO;
 import cn.fzu.edu.furever_home.post.entity.Post;
+import cn.fzu.edu.furever_home.post.entity.Comment;
 import cn.fzu.edu.furever_home.post.mapper.PostMapper;
+import cn.fzu.edu.furever_home.post.mapper.CommentMapper;
 import cn.fzu.edu.furever_home.post.request.CreatePostRequest;
 import cn.fzu.edu.furever_home.post.request.UpdatePostRequest;
 import cn.fzu.edu.furever_home.post.service.PostService;
 import cn.fzu.edu.furever_home.review.service.ReviewService;
 import cn.fzu.edu.furever_home.common.enums.ReviewTargetType;
 import cn.fzu.edu.furever_home.common.enums.ReviewStatus;
+import cn.fzu.edu.furever_home.auth.mapper.UserMapper;
+import cn.fzu.edu.furever_home.auth.entity.User;
+import cn.fzu.edu.furever_home.post.mapper.LikeMapper;
+import cn.fzu.edu.furever_home.post.entity.Like;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +28,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public class PostServiceImpl implements PostService {
     private final PostMapper postMapper;
     private final ReviewService reviewService;
+    private final CommentMapper commentMapper;
+    private final UserMapper userMapper;
+    private final LikeMapper likeMapper;
 
     @Override
     public PageResult<PostDTO> pageAll(int page, int pageSize) {
@@ -64,6 +73,8 @@ public class PostServiceImpl implements PostService {
             d.setLikeCount(p.getLikeCount());
             d.setCommentCount(p.getCommentCount());
             d.setCreateTime(p.getCreateTime());
+            User u = p.getUserId() == null ? null : userMapper.selectById(p.getUserId());
+            d.setUserName(u == null ? null : u.getUserName());
             return d;
         }).toList();
         return new PageResult<>(result.getCurrent(), result.getSize(), result.getTotal(), records);
@@ -111,6 +122,150 @@ public class PostServiceImpl implements PostService {
         if (p == null) return;
         if (!p.getUserId().equals(userId)) throw new IllegalStateException("无权删除该帖子");
         postMapper.deleteById(id);
+    }
+
+    @Override
+    public cn.fzu.edu.furever_home.common.result.PageResult<cn.fzu.edu.furever_home.post.dto.PostCommentDTO> listComments(Integer postId, int page, int pageSize, cn.fzu.edu.furever_home.post.enums.CommentSortBy sortBy, cn.fzu.edu.furever_home.post.enums.SortOrder order) {
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<Comment> mpPage = new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(page, pageSize);
+        LambdaQueryWrapper<Comment> wrapper = new LambdaQueryWrapper<Comment>()
+                .eq(Comment::getPostId, postId);
+        boolean asc = order == null || order == cn.fzu.edu.furever_home.post.enums.SortOrder.ASC;
+        if (sortBy == cn.fzu.edu.furever_home.post.enums.CommentSortBy.LIKES) {
+            wrapper.orderBy(true, asc, Comment::getLikeCount).orderBy(true, asc, Comment::getCreateTime);
+        } else {
+            wrapper.orderBy(true, asc, Comment::getCreateTime).orderBy(true, asc, Comment::getLikeCount);
+        }
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<Comment> result = commentMapper.selectPage(mpPage, wrapper);
+        java.util.List<cn.fzu.edu.furever_home.post.dto.PostCommentDTO> records = result.getRecords().stream().map(c -> {
+            cn.fzu.edu.furever_home.post.dto.PostCommentDTO dto = new cn.fzu.edu.furever_home.post.dto.PostCommentDTO();
+            dto.setCommentId(c.getCommentId());
+            dto.setParentCommentId(c.getParentCommentId());
+            dto.setContent(c.getContent());
+            dto.setLikeCount(c.getLikeCount());
+            dto.setCreateTime(c.getCreateTime());
+            dto.setUserId(c.getUserId());
+            User u = c.getUserId() == null ? null : userMapper.selectById(c.getUserId());
+            dto.setUserName(u == null ? null : u.getUserName());
+            return dto;
+        }).toList();
+        return new cn.fzu.edu.furever_home.common.result.PageResult<>(result.getCurrent(), result.getSize(), result.getTotal(), records);
+    }
+
+    @Override
+    public boolean toggleCommentLike(Integer userId, Integer commentId) {
+        Comment c = commentMapper.selectById(commentId);
+        if (c == null) throw new IllegalStateException("评论不存在");
+        Like existing = likeMapper.selectOne(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Like>()
+                .eq(Like::getUserId, userId)
+                .eq(Like::getKind, "评论")
+                .eq(Like::getTargetId, commentId)
+                .last("limit 1"));
+        boolean liked;
+        if (existing != null) {
+            likeMapper.deleteById(existing.getLikeId());
+            int cnt = (c.getLikeCount() == null ? 0 : c.getLikeCount()) - 1;
+            c.setLikeCount(Math.max(cnt, 0));
+            liked = false;
+        } else {
+            Like l = new Like();
+            l.setUserId(userId);
+            l.setKind("评论");
+            l.setTargetId(commentId);
+            l.setCreateTime(java.time.LocalDateTime.now());
+            likeMapper.insert(l);
+            c.setLikeCount((c.getLikeCount() == null ? 0 : c.getLikeCount()) + 1);
+            liked = true;
+        }
+        commentMapper.updateById(c);
+        return liked;
+    }
+
+    @Override
+    public Integer getCommentLikeCount(Integer commentId) {
+        Comment c = commentMapper.selectById(commentId);
+        return c == null ? null : c.getLikeCount();
+    }
+
+
+    @Override
+    public Integer submitComment(Integer userId, Integer postId, cn.fzu.edu.furever_home.post.request.SubmitCommentRequest req) {
+        Post p = postMapper.selectById(postId);
+        if (p == null || p.getReviewStatus() != ReviewStatus.APPROVED) throw new IllegalStateException("帖子不存在或未发布");
+        Comment c = new Comment();
+        c.setPostId(postId);
+        c.setUserId(userId);
+        c.setParentCommentId(req.getParentCommentId());
+        c.setContent(req.getContent());
+        c.setLikeCount(0);
+        c.setCreateTime(java.time.LocalDateTime.now());
+        commentMapper.insert(c);
+        p.setCommentCount((p.getCommentCount() == null ? 0 : p.getCommentCount()) + 1);
+        postMapper.updateById(p);
+        return c.getCommentId();
+    }
+
+    @Override
+    public PageResult<cn.fzu.edu.furever_home.post.dto.PostPublicDTO> search(String keyword, int page, int pageSize) {
+        Page<Post> mpPage = new Page<>(page, pageSize);
+        LambdaQueryWrapper<Post> wrapper = new LambdaQueryWrapper<Post>()
+                .eq(Post::getReviewStatus, ReviewStatus.APPROVED);
+        if (keyword != null && !keyword.isBlank()) {
+            String k = keyword.trim();
+            wrapper.and(w -> w.like(Post::getTitle, k).or().like(Post::getContent, k));
+        }
+        wrapper.orderByDesc(Post::getCreateTime);
+        Page<Post> result = postMapper.selectPage(mpPage, wrapper);
+        java.util.List<cn.fzu.edu.furever_home.post.dto.PostPublicDTO> records = result.getRecords().stream().map(p -> {
+            cn.fzu.edu.furever_home.post.dto.PostPublicDTO d = new cn.fzu.edu.furever_home.post.dto.PostPublicDTO();
+            d.setPostId(p.getPostId());
+            d.setUserId(p.getUserId());
+            d.setTitle(p.getTitle());
+            d.setContent(p.getContent());
+            d.setMediaUrls(p.getMediaUrls());
+            d.setViewCount(p.getViewCount());
+            d.setLikeCount(p.getLikeCount());
+            d.setCommentCount(p.getCommentCount());
+            d.setCreateTime(p.getCreateTime());
+            User u = p.getUserId() == null ? null : userMapper.selectById(p.getUserId());
+            d.setUserName(u == null ? null : u.getUserName());
+            return d;
+        }).toList();
+        return new PageResult<>(result.getCurrent(), result.getSize(), result.getTotal(), records);
+    }
+
+    @Override
+    public boolean toggleLike(Integer userId, Integer postId) {
+        Post p = postMapper.selectById(postId);
+        if (p == null || p.getReviewStatus() != ReviewStatus.APPROVED) throw new IllegalStateException("帖子不存在或未发布");
+        Like existing = likeMapper.selectOne(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Like>()
+                .eq(Like::getUserId, userId)
+                .eq(Like::getKind, "帖子")
+                .eq(Like::getTargetId, postId)
+                .last("limit 1"));
+        boolean liked;
+        if (existing != null) {
+            likeMapper.deleteById(existing.getLikeId());
+            int cnt = (p.getLikeCount() == null ? 0 : p.getLikeCount()) - 1;
+            p.setLikeCount(Math.max(cnt, 0));
+            liked = false;
+        } else {
+            Like l = new Like();
+            l.setUserId(userId);
+            l.setKind("帖子");
+            l.setTargetId(postId);
+            l.setCreateTime(java.time.LocalDateTime.now());
+            likeMapper.insert(l);
+            p.setLikeCount((p.getLikeCount() == null ? 0 : p.getLikeCount()) + 1);
+            liked = true;
+        }
+        postMapper.updateById(p);
+        return liked;
+    }
+
+    @Override
+    public Integer getLikeCount(Integer postId) {
+        Post p = postMapper.selectById(postId);
+        return p == null ? null : p.getLikeCount();
     }
 
     private PostDTO toDTO(Post p) {

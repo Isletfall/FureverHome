@@ -10,6 +10,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import cn.fzu.edu.furever_home.common.result.Result;
@@ -26,8 +27,31 @@ public class StorageController {
 
     @PostMapping(value = "/upload/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "上传图片", description = "返回可直接查看的服务路由")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
-    public Result<String> uploadImage(@RequestPart("file") MultipartFile file) {
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
+    public Result<String> uploadImage(@RequestPart("file") MultipartFile file, MultipartHttpServletRequest multipartRequest) {
+        if (multipartRequest != null) {
+            java.util.List<MultipartFile> files = multipartRequest.getFiles("file");
+            if (files != null && files.size() > 1) {
+                return Result.error(400, "一次仅允许上传一个文件，请仅上传一个 file");
+            }
+        }
+        if (file == null || file.isEmpty()) {
+            return Result.error(400, "请上传文件，字段名为 file");
+        }
+        String ct = file.getContentType();
+        String name = file.getOriginalFilename();
+        boolean isPng = ct != null && ct.equalsIgnoreCase(org.springframework.http.MediaType.IMAGE_PNG_VALUE);
+        boolean isJpeg = ct != null && (ct.equalsIgnoreCase(org.springframework.http.MediaType.IMAGE_JPEG_VALUE) || ct.equalsIgnoreCase("image/jpg"));
+        if (!isPng && !isJpeg) {
+            boolean byExt = false;
+            if (name != null) {
+                String lower = name.toLowerCase();
+                byExt = lower.endsWith(".png") || lower.endsWith(".jpg") || lower.endsWith(".jpeg");
+            }
+            if (!byExt) {
+                return Result.error(400, "仅支持 PNG 或 JPG 图片");
+            }
+        }
         String bucket = env.getProperty("minio.bucket-images", "images");
         String objectName = storageService.upload(bucket, file, null);
         String viewPath = "/api/storage/image/" + objectName;
@@ -36,8 +60,21 @@ public class StorageController {
 
     @PostMapping(value = "/upload/video", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "上传视频", description = "返回可直接查看的服务路由")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
-    public Result<String> uploadVideo(@RequestPart("file") MultipartFile file) {
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
+    public Result<String> uploadVideo(@RequestPart("file") MultipartFile file, MultipartHttpServletRequest multipartRequest) {
+        if (multipartRequest != null) {
+            java.util.List<MultipartFile> files = multipartRequest.getFiles("file");
+            if (files != null && files.size() > 1) {
+                return Result.error(400, "一次仅允许上传一个视频文件，请仅上传一个 file");
+            }
+        }
+        if (file == null || file.isEmpty()) {
+            return Result.error(400, "请上传视频文件，字段名为 file");
+        }
+        String ct = file.getContentType();
+        if (ct == null || !ct.toLowerCase().startsWith("video/")) {
+            return Result.error(400, "仅支持 video/* 格式的视频");
+        }
         long max = 100L * 1024 * 1024;
         if (file.getSize() > max) {
             return Result.error(400, "视频大小超过100MB");
@@ -122,7 +159,7 @@ public class StorageController {
 
     @DeleteMapping("/image/{object}")
     @Operation(summary = "删除图片")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
     public Result<Void> deleteImage(@Parameter(description = "图片对象名") @PathVariable("object") String objectName) {
         String bucket = env.getProperty("minio.bucket-images", "images");
         storageService.delete(bucket, objectName);
@@ -131,7 +168,7 @@ public class StorageController {
 
     @DeleteMapping("/video/{object}")
     @Operation(summary = "删除视频")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
     public Result<Void> deleteVideo(@Parameter(description = "视频对象名") @PathVariable("object") String objectName) {
         String bucket = env.getProperty("minio.bucket-videos", "videos");
         storageService.delete(bucket, objectName);

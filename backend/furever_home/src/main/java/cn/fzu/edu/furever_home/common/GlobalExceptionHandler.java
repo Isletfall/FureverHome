@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import cn.fzu.edu.furever_home.common.result.Result;
 
 @RestControllerAdvice
@@ -75,5 +76,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Result<Void>> handleMaxUpload(MaxUploadSizeExceededException e) {
         log.error("MaxUploadSizeExceededException", e);
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).contentType(MediaType.APPLICATION_JSON).body(Result.error(413, "上传大小超限"));
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Result<Void>> handleMissingPart(MissingServletRequestPartException e) {
+        log.warn("MissingServletRequestPartException", e);
+        String msg = "缺少文件，请使用 multipart/form-data 并使用字段名 file 上传";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(Result.error(400, msg));
     }
 }

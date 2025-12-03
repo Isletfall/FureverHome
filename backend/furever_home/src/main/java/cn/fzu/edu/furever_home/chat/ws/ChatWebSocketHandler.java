@@ -2,6 +2,11 @@ package cn.fzu.edu.furever_home.chat.ws;
 
 import cn.dev33.satoken.stp.StpUtil;
 import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import cn.fzu.edu.furever_home.chat.mapper.ChatMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -16,6 +21,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final ChatWebSocketSessionManager sessionManager;
+    private final ChatMapper chatMapper;
+    private final ObjectMapper objectMapper;
+    private static final Logger log = LoggerFactory.getLogger(ChatWebSocketHandler.class);
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -26,6 +34,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         }
         session.getAttributes().put("uid", uid);
         sessionManager.register(uid, session);
+        log.info("WS connected uid={} sessionId={}", uid, session.getId());
     }
 
     @Override
@@ -34,10 +43,39 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         if (v instanceof Integer) {
             sessionManager.unregister((Integer) v, session);
         }
+        log.info("WS closed uid={} sessionId={} status={}", v, session.getId(), status);
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+        Object v = session.getAttributes().get("uid");
+        if (!(v instanceof Integer)) return;
+        Integer uid = (Integer) v;
+        String payload = message.getPayload();
+        try {
+            JsonNode root = objectMapper.readTree(payload);
+            JsonNode t = root.get("type");
+            if (t == null || !t.isTextual()) return;
+            String type = t.asText();
+            if ("typing".equals(type)) {
+                JsonNode cidNode = root.get("conversationId");
+                JsonNode actionNode = root.get("action");
+                if (cidNode == null || !cidNode.isInt()) return;
+                Integer conversationId = cidNode.asInt();
+                Integer targetId = findTargetUserId(conversationId, uid);
+                if (targetId == null) return;
+                java.util.Map<String, Object> out = new java.util.HashMap<>();
+                out.put("type", "typing");
+                java.util.Map<String, Object> data = new java.util.HashMap<>();
+                data.put("conversationId", conversationId);
+                data.put("fromUserId", uid);
+                data.put("action", actionNode != null && actionNode.isTextual() ? actionNode.asText() : "start");
+                out.put("data", data);
+                String text = objectMapper.writeValueAsString(out);
+                log.info("WS event typing from uid={} to userId={} payload={}", uid, targetId, text);
+                sessionManager.sendToUser(targetId, text);
+            }
+        } catch (Exception ignored) {}
     }
 
     private Integer parseAndAuth(URI uri) {
@@ -52,6 +90,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private Integer findTargetUserId(Integer conversationId, Integer currentUserId) {
+        cn.fzu.edu.furever_home.chat.entity.Chat c = chatMapper.selectById(conversationId);
+        if (c == null) return null;
+        if (java.util.Objects.equals(c.getCreatorId(), currentUserId)) return c.getReceiverId();
+        return c.getCreatorId();
     }
 
     private Map<String, String> parseQuery(String query) {
