@@ -24,6 +24,16 @@ public class AdoptServiceImpl implements AdoptService {
 
     @Override
     public Integer submit(Integer userId, SubmitAdoptRequest req) {
+        cn.fzu.edu.furever_home.animal.entity.Animal animal = animalMapper.selectById(req.getAnimalId());
+        if (animal == null) {
+            throw new IllegalArgumentException("动物不存在或已删除");
+        }
+        if (animal.getUserId() != null && animal.getUserId().equals(userId)) {
+            throw new IllegalStateException("不能申请领养自己的动物");
+        }
+        if (animal.getReviewStatus() != ReviewStatus.APPROVED) {
+            throw new IllegalStateException("动物未通过审核，暂不可申请");
+        }
         Long exists = adoptMapper.selectCount(new LambdaQueryWrapper<Adopt>()
                 .eq(Adopt::getAnimalId, req.getAnimalId())
                 .eq(Adopt::getUserId, userId));
@@ -34,13 +44,13 @@ public class AdoptServiceImpl implements AdoptService {
         a.setAnimalId(req.getAnimalId());
         a.setUserId(userId);
         a.setApplicationStatus(ApplicationStatus.APPLYING);
-        a.setLivingEnvironment(req.getLivingEnvironment());
-        a.setHouseType(req.getHouseType());
-        a.setHasOtherPets(req.getHasOtherPets());
-        a.setFamilyMemberCount(req.getFamilyMemberCount());
-        a.setHasChild(req.getHasChild());
+        a.setUserName(req.getUserName());
+        a.setPhone(req.getPhone());
+        a.setEmail(req.getEmail());
+        a.setProvince(req.getProvince());
+        a.setCity(req.getCity());
+        a.setLivingLocation(req.getLivingLocation());
         a.setAdoptReason(req.getAdoptReason());
-        a.setMonthSalary(req.getMonthSalary());
         a.setCreateTime(LocalDateTime.now());
         adoptMapper.insert(a);
         reviewService.createPending(ReviewTargetType.ADOPT, a.getAdoptId());
@@ -90,13 +100,13 @@ public class AdoptServiceImpl implements AdoptService {
         d.setAnimalId(a.getAnimalId());
         d.setUserId(a.getUserId());
         d.setApplicationStatus(a.getApplicationStatus());
-        d.setLivingEnvironment(a.getLivingEnvironment());
-        d.setHouseType(a.getHouseType());
-        d.setHasOtherPets(a.getHasOtherPets());
-        d.setFamilyMemberCount(a.getFamilyMemberCount());
-        d.setHasChild(a.getHasChild());
+        d.setUserName(a.getUserName());
+        d.setPhone(a.getPhone());
+        d.setEmail(a.getEmail());
+        d.setProvince(a.getProvince());
+        d.setCity(a.getCity());
+        d.setLivingLocation(a.getLivingLocation());
         d.setAdoptReason(a.getAdoptReason());
-        d.setMonthSalary(a.getMonthSalary());
         d.setCreateTime(a.getCreateTime());
         d.setPassTime(a.getPassTime());
         d.setReviewStatus(a.getReviewStatus());

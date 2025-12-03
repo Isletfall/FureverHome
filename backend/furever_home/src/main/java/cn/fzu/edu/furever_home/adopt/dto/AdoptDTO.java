@@ -17,20 +17,20 @@ public class AdoptDTO {
     private Integer userId;
     @Schema(description = "申请状态")
     private ApplicationStatus applicationStatus;
-    @Schema(description = "居住环境")
-    private LivingEnvironment livingEnvironment;
-    @Schema(description = "房屋类型")
-    private HouseType houseType;
-    @Schema(description = "是否有其他宠物")
-    private Boolean hasOtherPets;
-    @Schema(description = "家庭成员数量")
-    private Integer familyMemberCount;
-    @Schema(description = "是否有儿童")
-    private Boolean hasChild;
+    @Schema(description = "申请人昵称")
+    private String userName;
+    @Schema(description = "申请人电话")
+    private String phone;
+    @Schema(description = "申请人邮箱")
+    private String email;
+    @Schema(description = "所在省")
+    private String province;
+    @Schema(description = "所在市")
+    private String city;
+    @Schema(description = "居住地址")
+    private String livingLocation;
     @Schema(description = "领养理由")
     private String adoptReason;
-    @Schema(description = "月收入")
-    private Integer monthSalary;
     @Schema(description = "申请时间")
     private LocalDateTime createTime;
     @Schema(description = "审核通过时间")

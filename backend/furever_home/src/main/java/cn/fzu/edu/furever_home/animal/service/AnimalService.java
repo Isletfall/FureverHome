@@ -4,12 +4,22 @@ import cn.fzu.edu.furever_home.animal.dto.AnimalDTO;
 import cn.fzu.edu.furever_home.animal.request.CreateAnimalRequest;
 import cn.fzu.edu.furever_home.animal.request.UpdateAnimalRequest;
 
+import cn.fzu.edu.furever_home.common.enums.Gender;
+import cn.fzu.edu.furever_home.common.enums.Species;
 import cn.fzu.edu.furever_home.common.result.PageResult;
 import cn.fzu.edu.furever_home.animal.dto.AnimalPublicDTO;
 import cn.fzu.edu.furever_home.common.enums.AdoptionStatus;
 
 public interface AnimalService {
     PageResult<AnimalDTO> pageAll(int page, int pageSize);
+    PageResult<AnimalPublicDTO> pageAllPublic(int page, int pageSize,
+                                              String province,
+                                              String city,
+                                              Species species,
+                                              Gender gender,
+                                              Integer minAge,
+                                              Integer maxAge,
+                                              AdoptionStatus adoptionStatus);
     AnimalDTO getById(Integer id, Integer currentUserId);
     Integer create(Integer userId, CreateAnimalRequest req);
     void update(Integer userId, Integer id, UpdateAnimalRequest req);

@@ -26,7 +26,7 @@ public class RatingController {
     @GetMapping("/received")
     @SaCheckLogin
     @Operation(summary = "获取我的评价（他人对我的评价）列表")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
     public Result<PageResult<ReceivedRatingItemDTO>> received(@RequestParam(defaultValue = "1") int page,
                                                               @RequestParam(defaultValue = "20") int pageSize) {
         Integer uid = StpUtil.getLoginIdAsInt();
@@ -37,7 +37,7 @@ public class RatingController {
     @GetMapping("/mine/{targetUserId}")
     @SaCheckLogin
     @Operation(summary = "获取我对某个用户的评价")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
     public Result<MyRatingDTO> myRating(@PathVariable Integer targetUserId) {
         Integer uid = StpUtil.getLoginIdAsInt();
         MyRatingDTO data = ratingService.getMyRatingFor(uid, targetUserId);
@@ -47,7 +47,7 @@ public class RatingController {
     @PostMapping("/mine/{targetUserId}")
     @SaCheckLogin
     @Operation(summary = "添加我对某个用户的评价")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
     public Result<Void> addMyRating(@PathVariable Integer targetUserId,
                                     @RequestParam Integer score,
                                     @RequestParam String content) {
@@ -59,7 +59,7 @@ public class RatingController {
     @PutMapping("/mine/{targetUserId}")
     @SaCheckLogin
     @Operation(summary = "修改我对某个用户的评价")
-    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer xxxxxx")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
     public Result<Void> updateMyRating(@PathVariable Integer targetUserId,
                                        @RequestParam Integer ratingId,
                                        @RequestParam Integer score,

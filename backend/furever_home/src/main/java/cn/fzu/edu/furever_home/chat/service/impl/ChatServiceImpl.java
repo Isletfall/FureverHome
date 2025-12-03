@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,7 +33,8 @@ public class ChatServiceImpl implements ChatService {
     private final UserMapper userMapper;
     private final StringRedisTemplate stringRedisTemplate;
     private final cn.fzu.edu.furever_home.chat.ws.ChatWebSocketSessionManager wsSessionManager;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
+    private static final Logger log = LoggerFactory.getLogger(ChatServiceImpl.class);
 
     @Override
     public PageResult<ConversationDTO> listConversations(Integer userId, int page, int pageSize) {
@@ -141,7 +144,17 @@ public class ChatServiceImpl implements ChatService {
             data.put("createdAt", dto.getCreatedAt());
             payload.put("data", data);
             String text = objectMapper.writeValueAsString(payload);
+            log.info("WS event new_message -> userId={} payload={}", receiverId, text);
             wsSessionManager.sendToUser(receiverId, text);
+            Integer unread = totalUnread(receiverId);
+            java.util.Map<String, Object> uPayload = new java.util.HashMap<>();
+            uPayload.put("type", "unread_count");
+            java.util.Map<String, Object> uData = new java.util.HashMap<>();
+            uData.put("totalUnread", unread);
+            uPayload.put("data", uData);
+            String uText = objectMapper.writeValueAsString(uPayload);
+            log.info("WS event unread_count -> userId={} payload={}", receiverId, uText);
+            wsSessionManager.sendToUser(receiverId, uText);
         } catch (Exception ignored) {}
         return dto;
     }
@@ -151,6 +164,22 @@ public class ChatServiceImpl implements ChatService {
         Message last = messageMapper.findLastByChat(conversationId);
         if (last != null) {
             setLastReadId(userId, conversationId, last.getMessageId());
+            Chat c = chatMapper.selectById(conversationId);
+            if (c != null) {
+                Integer otherId = java.util.Objects.equals(c.getCreatorId(), userId) ? c.getReceiverId() : c.getCreatorId();
+                try {
+                    java.util.Map<String, Object> payload = new java.util.HashMap<>();
+                    payload.put("type", "read");
+                    java.util.Map<String, Object> data = new java.util.HashMap<>();
+                    data.put("conversationId", conversationId);
+                    data.put("readerId", userId);
+                    data.put("lastReadMessageId", last.getMessageId());
+                    payload.put("data", data);
+                    String text = objectMapper.writeValueAsString(payload);
+                    log.info("WS event read -> userId={} payload={}", otherId, text);
+                    wsSessionManager.sendToUser(otherId, text);
+                } catch (Exception ignored) {}
+            }
         }
     }
 

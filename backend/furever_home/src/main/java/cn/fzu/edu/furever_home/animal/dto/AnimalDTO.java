@@ -13,6 +13,18 @@ public class AnimalDTO {
     private Integer animalId;
     @Schema(description = "发布用户ID")
     private Integer userId;
+    @Schema(description = "发布用户昵称")
+    private String userName;
+    @Schema(description = "发布者所在地")
+    private String ownerLocation;
+    @Schema(description = "发布者邮箱")
+    private String ownerEmail;
+    @Schema(description = "发布者联系电话")
+    private String ownerPhone;
+    @Schema(description = "宠物目前位置")
+    private String currentLocation;
+    @Schema(description = "联系邮箱")
+    private String contactEmail;
     @Schema(description = "动物名称")
     private String animalName;
     @Schema(description = "照片URL列表（JSON数组）", example = "[\"https://img.example.com/a.jpg\",\"https://img.example.com/b.jpg\"]")

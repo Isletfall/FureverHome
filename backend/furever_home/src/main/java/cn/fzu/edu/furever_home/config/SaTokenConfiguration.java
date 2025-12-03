@@ -8,6 +8,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.format.FormatterRegistry;
+import org.springframework.core.convert.converter.Converter;
+import cn.fzu.edu.furever_home.common.enums.AdoptionStatus;
+import cn.fzu.edu.furever_home.common.enums.Gender;
+import cn.fzu.edu.furever_home.common.enums.Species;
 
 @Configuration
 public class SaTokenConfiguration implements WebMvcConfigurer {
@@ -26,5 +31,45 @@ public class SaTokenConfiguration implements WebMvcConfigurer {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addConverter(new Converter<String, AdoptionStatus>() {
+            @Override
+            public AdoptionStatus convert(String source) {
+                if (source == null) return null;
+                String s = source.trim();
+                for (AdoptionStatus e : AdoptionStatus.values()) {
+                    if (e.getValue().equals(s)) return e;
+                    if (e.name().equalsIgnoreCase(s)) return e;
+                }
+                throw new IllegalArgumentException("Invalid AdoptionStatus: " + source);
+            }
+        });
+        registry.addConverter(new Converter<String, Gender>() {
+            @Override
+            public Gender convert(String source) {
+                if (source == null) return null;
+                String s = source.trim();
+                for (Gender e : Gender.values()) {
+                    if (e.getValue().equals(s)) return e;
+                    if (e.name().equalsIgnoreCase(s)) return e;
+                }
+                throw new IllegalArgumentException("Invalid Gender: " + source);
+            }
+        });
+        registry.addConverter(new Converter<String, Species>() {
+            @Override
+            public Species convert(String source) {
+                if (source == null) return null;
+                String s = source.trim();
+                for (Species e : Species.values()) {
+                    if (e.getValue().equals(s)) return e;
+                    if (e.name().equalsIgnoreCase(s)) return e;
+                }
+                throw new IllegalArgumentException("Invalid Species: " + source);
+            }
+        });
     }
 }

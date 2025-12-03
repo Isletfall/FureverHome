@@ -1,10 +1,10 @@
 CREATE DATABASE IF NOT EXISTS furever_home DEFAULT CHARACTER SET utf8mb4;
 USE furever_home;
 SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE IF EXISTS email_verification, review, rating, comments, likes, message, chat, adopt, post, animal, user_roles, role_permissions, permissions, roles, users;
+DROP TABLE IF EXISTS email_verification, review, rating, comments, likes, message, chat, adopt, post, animal;
 SET FOREIGN_KEY_CHECKS = 1;
 
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     user_id INT AUTO_INCREMENT PRIMARY KEY COMMENT '用户ID',
     user_name VARCHAR(50) NOT NULL UNIQUE COMMENT '用户名',
     user_age INT DEFAULT NULL COMMENT '年龄',
@@ -36,6 +36,11 @@ CREATE TABLE animal (
   is_sterilized ENUM('是','否','未知') DEFAULT NULL COMMENT '是否绝育',
   adoption_status ENUM('短期领养', '长期领养') NOT NULL COMMENT '领养状态',
   short_description VARCHAR(200) COMMENT '宠物简介',
+  contact_phone VARCHAR(50) DEFAULT NULL COMMENT '联系电话',
+  current_location VARCHAR(50) DEFAULT NULL COMMENT '目前位置',
+  contact_email VARCHAR(255) DEFAULT NULL COMMENT '电子邮箱',
+  current_province VARCHAR(50) DEFAULT NULL COMMENT '所在省',
+  current_city VARCHAR(50) DEFAULT NULL COMMENT '所在市',
   review_status ENUM('待审核','通过','拒绝') NOT NULL DEFAULT '待审核',
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
@@ -87,15 +92,15 @@ CREATE TABLE adopt (
     adopt_id INT AUTO_INCREMENT PRIMARY KEY COMMENT '领养记录ID',
     animal_id INT NOT NULL COMMENT '领养动物ID',
     user_id INT NOT NULL COMMENT '申请人/领养用户ID',
+    user_name VARCHAR(50) NOT NULL COMMENT '领养人昵称',
+    phone VARCHAR(50) NOT NULL COMMENT '领养人电话',
+    email VARCHAR(50) NOT NULL COMMENT '领养人邮箱',
     application_status ENUM('申请中','申请成功','申请失败') NOT NULL DEFAULT '申请中' COMMENT '申请领养的状态',
     review_status ENUM('待审核','通过','拒绝') NOT NULL DEFAULT '待审核',
-    living_environment ENUM('宿舍','公寓','别墅','其他') NOT NULL COMMENT '申请者居住环境',
-    house_type ENUM('拥有','租用') NOT NULL COMMENT '申请者房屋产权',
-    has_other_pets BOOLEAN NOT NULL COMMENT '申请者是否拥有其他动物',
-    family_member_count INT NOT NULL CHECK (family_member_count > 0) COMMENT '申请者家庭同居人数',
-    has_child BOOLEAN NOT NULL COMMENT '申请者是否有小孩',
+    province VARCHAR(50) NOT NULL COMMENT '所在省',
+    city VARCHAR(50) NOT NULL COMMENT '所在市',
+    living_location VARCHAR(1000) NOT NULL COMMENT '居住地址',
     adopt_reason VARCHAR(1000) NOT NULL COMMENT '领养原因',
-    month_salary INT NOT NULL CHECK (month_salary > 0) COMMENT '申请者月工资',
     create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     pass_time TIMESTAMP NULL COMMENT '审核结束时间，管理员审核完一条申请记录后插入当前时间',
 
@@ -276,7 +281,7 @@ SELECT r.role_id, p.permission_id FROM roles r JOIN permissions p
   );
 
 -- 初始化用户与用户-角色映射
-INSERT INTO users (user_name, user_age, password_hash, email, avatar_url, sex, location, proof_text, proof_photo)
+INSERT IGNORE INTO users (user_name, user_age, password_hash, email, avatar_url, sex, location, proof_text, proof_photo)
 VALUES
 ('admin', 30, '$2a$10$eImG8G7G7G7G8G7G8G7G8uOqzTQn5Jf0gDsw4hV1Bf6e2bC/1aQyS', 'admin@example.com', NULL, '男', '福州', NULL, NULL),
 ('mod',   28, '$2a$10$eImG8G7G7G7G8G7G8G7G8uOqzTQn5Jf0gDsw4hV1Bf6e2bC/1aQyS', 'mod@example.com',   NULL, '女', '福州', NULL, NULL),
@@ -291,8 +296,10 @@ INSERT INTO user_roles (user_id, role_id)
 SELECT u.user_id, r.role_id FROM users u JOIN roles r ON u.user_name IN ('alice','bob') AND r.role_code='USER';
 
 -- 初始化业务数据
-INSERT INTO animal (user_id, animal_name, photo_urls, species, breed, gender, animal_age, health_status, is_sterilized, adoption_status, short_description)
-SELECT u.user_id, '雪球', JSON_ARRAY('https://img.example.com/cat1.jpg'), '猫', '英短', '母', 12, '健康', '是', '短期领养', '活泼可爱'
+INSERT INTO animal (user_id, animal_name, photo_urls, species, breed, gender, animal_age, health_status, is_sterilized, adoption_status, short_description, contact_phone, current_location, contact_email, current_province, current_city)
+SELECT u.user_id, '雪球', JSON_ARRAY('https://img.example.com/cat1.jpg'), '猫', '英短', '母', 12, '健康', '是', '短期领养', '活泼可爱', '13800000000', u.location, u.email,
+       CASE u.location WHEN '福州' THEN '福建省' WHEN '厦门' THEN '福建省' WHEN '泉州' THEN '福建省' ELSE NULL END,
+       u.location
 FROM users u WHERE u.user_name='alice';
 
 INSERT INTO post (user_id, title, content, media_urls)
@@ -316,8 +323,8 @@ SELECT c.chat_id, u.user_id, '你好，想了解雪球的情况'
 FROM chat c JOIN users u ON u.user_name='bob'
 ORDER BY c.chat_id DESC LIMIT 1;
 
-INSERT INTO adopt (animal_id, user_id, application_status, living_environment, house_type, has_other_pets, family_member_count, has_child, adopt_reason, month_salary, pass_time)
-SELECT a.animal_id, u.user_id, '申请成功', '公寓', '租用', FALSE, 2, FALSE, '非常喜欢猫咪，有稳定收入', 8000, CURRENT_TIMESTAMP
+INSERT INTO adopt (animal_id, user_id, user_name, phone, email, application_status, review_status, province, city, living_location, adopt_reason, pass_time)
+SELECT a.animal_id, u.user_id, u.user_name, '13800000000', u.email, '申请成功', '通过', '福建省', '福州市', '鼓楼区公寓', '非常喜欢猫咪，有稳定收入', CURRENT_TIMESTAMP
 FROM animal a JOIN users u ON a.animal_name='雪球' AND u.user_name='bob';
 
 INSERT INTO rating (user_id, target_user_id, adopt_id, score, content)

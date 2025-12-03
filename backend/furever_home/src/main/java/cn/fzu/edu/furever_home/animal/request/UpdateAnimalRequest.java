@@ -2,6 +2,7 @@ package cn.fzu.edu.furever_home.animal.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import cn.fzu.edu.furever_home.common.enums.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -36,4 +37,25 @@ public class UpdateAnimalRequest {
     @Schema(description = "宠物简介")
     @Size(max = 200)
     private String shortDescription;
+
+    @Schema(description = "联系电话")
+    @Size(max = 50)
+    private String contactPhone;
+
+    @Schema(description = "目前位置")
+    @Size(max = 50)
+    private String currentLocation;
+
+    @Schema(description = "联系邮箱")
+    @Email
+    @Size(max = 255)
+    private String contactEmail;
+
+    @Schema(description = "所在省")
+    @Size(max = 50)
+    private String province;
+
+    @Schema(description = "所在市")
+    @Size(max = 50)
+    private String city;
 }

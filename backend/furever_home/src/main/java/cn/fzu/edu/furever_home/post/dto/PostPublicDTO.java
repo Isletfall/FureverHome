@@ -10,6 +10,8 @@ public class PostPublicDTO {
     private Integer postId;
     @Schema(description = "用户ID")
     private Integer userId;
+    @Schema(description = "发布者昵称")
+    private String userName;
     @Schema(description = "标题")
     private String title;
     @Schema(description = "正文内容")

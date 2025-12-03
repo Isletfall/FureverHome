@@ -7,6 +7,8 @@ import cn.fzu.edu.furever_home.common.enums.AdoptionStatus;
 import cn.fzu.edu.furever_home.common.enums.ReviewStatus;
 import cn.fzu.edu.furever_home.common.enums.ReviewTargetType;
 import cn.fzu.edu.furever_home.review.service.ReviewService;
+import cn.fzu.edu.furever_home.auth.mapper.UserMapper;
+import cn.fzu.edu.furever_home.auth.entity.User;
 import cn.fzu.edu.furever_home.animal.request.CreateAnimalRequest;
 import cn.fzu.edu.furever_home.animal.request.UpdateAnimalRequest;
 import cn.fzu.edu.furever_home.animal.service.AnimalService;
@@ -23,6 +25,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public class AnimalServiceImpl implements AnimalService {
     private final AnimalMapper animalMapper;
     private final ReviewService reviewService;
+    private final UserMapper userMapper;
 
     @Override
     public PageResult<AnimalDTO> pageAll(int page, int pageSize) {
@@ -32,6 +35,63 @@ public class AnimalServiceImpl implements AnimalService {
                 .orderByDesc(Animal::getCreatedAt);
         Page<Animal> result = animalMapper.selectPage(mpPage, wrapper);
         java.util.List<AnimalDTO> records = result.getRecords().stream().map(this::toDTO).toList();
+        return new PageResult<>(result.getCurrent(), result.getSize(), result.getTotal(), records);
+    }
+
+    @Override
+    public PageResult<cn.fzu.edu.furever_home.animal.dto.AnimalPublicDTO> pageAllPublic(int page, int pageSize,
+                                                                                        String province,
+                                                                                        String city,
+                                                                                        cn.fzu.edu.furever_home.common.enums.Species species,
+                                                                                        cn.fzu.edu.furever_home.common.enums.Gender gender,
+                                                                                        Integer minAge,
+                                                                                        Integer maxAge,
+                                                                                        cn.fzu.edu.furever_home.common.enums.AdoptionStatus adoptionStatus) {
+        Page<Animal> mpPage = new Page<>(page, pageSize);
+        LambdaQueryWrapper<Animal> wrapper = new LambdaQueryWrapper<Animal>()
+                .eq(Animal::getReviewStatus, ReviewStatus.APPROVED);
+        if (province != null && !province.isBlank()) {
+            wrapper.eq(Animal::getCurrentProvince, province);
+        }
+        if (city != null && !city.isBlank()) {
+            wrapper.eq(Animal::getCurrentCity, city);
+        }
+        if (species != null) {
+            wrapper.eq(Animal::getSpecies, species);
+        }
+        if (gender != null) {
+            wrapper.eq(Animal::getGender, gender);
+        }
+        if (adoptionStatus != null) {
+            wrapper.eq(Animal::getAdoptionStatus, adoptionStatus);
+        }
+        if (minAge != null) {
+            wrapper.ge(Animal::getAnimalAge, minAge);
+        }
+        if (maxAge != null) {
+            wrapper.le(Animal::getAnimalAge, maxAge);
+        }
+        wrapper.orderByDesc(Animal::getCreatedAt);
+        Page<Animal> result = animalMapper.selectPage(mpPage, wrapper);
+        java.util.List<cn.fzu.edu.furever_home.animal.dto.AnimalPublicDTO> records = result.getRecords().stream().map(a -> {
+            cn.fzu.edu.furever_home.animal.dto.AnimalPublicDTO d = new cn.fzu.edu.furever_home.animal.dto.AnimalPublicDTO();
+            d.setAnimalId(a.getAnimalId());
+            d.setUserId(a.getUserId());
+            d.setAnimalName(a.getAnimalName());
+            d.setPhotoUrls(a.getPhotoUrls());
+            d.setSpecies(a.getSpecies());
+            d.setBreed(a.getBreed());
+            d.setGender(a.getGender());
+            d.setAnimalAge(a.getAnimalAge());
+            d.setIsSterilized(a.getIsSterilized());
+            d.setAdoptionStatus(a.getAdoptionStatus());
+            d.setShortDescription(a.getShortDescription());
+            User owner = a.getUserId() == null ? null : userMapper.selectById(a.getUserId());
+            d.setAdopterName(owner == null ? null : owner.getUserName());
+            Integer days = a.getCreatedAt() == null ? null : (int) java.time.temporal.ChronoUnit.DAYS.between(a.getCreatedAt(), java.time.LocalDateTime.now());
+            d.setAdoptionDays(days);
+            return d;
+        }).toList();
         return new PageResult<>(result.getCurrent(), result.getSize(), result.getTotal(), records);
     }
 
@@ -58,6 +118,11 @@ public class AnimalServiceImpl implements AnimalService {
         a.setIsSterilized(req.getIsSterilized());
         a.setAdoptionStatus(req.getAdoptionStatus());
         a.setShortDescription(req.getShortDescription());
+        a.setContactPhone(req.getContactPhone());
+        a.setCurrentLocation(req.getCurrentLocation());
+        a.setContactEmail(req.getContactEmail());
+        a.setCurrentProvince(req.getProvince());
+        a.setCurrentCity(req.getCity());
         a.setCreatedAt(LocalDateTime.now());
         a.setUpdatedAt(LocalDateTime.now());
         animalMapper.insert(a);
@@ -92,6 +157,16 @@ public class AnimalServiceImpl implements AnimalService {
             a.setAdoptionStatus(req.getAdoptionStatus());
         if (req.getShortDescription() != null)
             a.setShortDescription(req.getShortDescription());
+        if (req.getContactPhone() != null)
+            a.setContactPhone(req.getContactPhone());
+        if (req.getCurrentLocation() != null)
+            a.setCurrentLocation(req.getCurrentLocation());
+        if (req.getContactEmail() != null)
+            a.setContactEmail(req.getContactEmail());
+        if (req.getProvince() != null)
+            a.setCurrentProvince(req.getProvince());
+        if (req.getCity() != null)
+            a.setCurrentCity(req.getCity());
         a.setUpdatedAt(LocalDateTime.now());
         animalMapper.updateById(a);
     }
@@ -112,6 +187,13 @@ public class AnimalServiceImpl implements AnimalService {
         AnimalDTO d = new AnimalDTO();
         d.setAnimalId(a.getAnimalId());
         d.setUserId(a.getUserId());
+        User u = a.getUserId() == null ? null : userMapper.selectById(a.getUserId());
+        d.setUserName(u == null ? null : u.getUserName());
+        d.setOwnerLocation(u == null ? null : u.getLocation());
+        d.setOwnerEmail(u == null ? null : u.getEmail());
+        d.setOwnerPhone(a.getContactPhone());
+        d.setCurrentLocation(a.getCurrentLocation());
+        d.setContactEmail(a.getContactEmail());
         d.setAnimalName(a.getAnimalName());
         d.setPhotoUrls(a.getPhotoUrls());
         d.setSpecies(a.getSpecies());
@@ -157,10 +239,13 @@ public class AnimalServiceImpl implements AnimalService {
             d.setBreed(a.getBreed());
             d.setGender(a.getGender());
             d.setAnimalAge(a.getAnimalAge());
-            d.setHealthStatus(a.getHealthStatus());
             d.setIsSterilized(a.getIsSterilized());
             d.setAdoptionStatus(a.getAdoptionStatus());
             d.setShortDescription(a.getShortDescription());
+            User owner = a.getUserId() == null ? null : userMapper.selectById(a.getUserId());
+            d.setAdopterName(owner == null ? null : owner.getUserName());
+            Integer days = a.getCreatedAt() == null ? null : (int) java.time.temporal.ChronoUnit.DAYS.between(a.getCreatedAt(), java.time.LocalDateTime.now());
+            d.setAdoptionDays(days);
             return d;
         }).toList();
         return new PageResult<>(result.getCurrent(), result.getSize(), result.getTotal(), records);
