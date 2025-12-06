@@ -55,7 +55,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PageResult<cn.fzu.edu.furever_home.post.dto.PostPublicDTO> pageByUser(Integer userId, int page, int pageSize) {
+    public PageResult<cn.fzu.edu.furever_home.post.dto.PostPublicDTO> pageByUser(Integer userId, int page,
+            int pageSize) {
         Page<Post> mpPage = new Page<>(page, pageSize);
         LambdaQueryWrapper<Post> wrapper = new LambdaQueryWrapper<Post>()
                 .eq(Post::getUserId, userId)
@@ -68,7 +69,7 @@ public class PostServiceImpl implements PostService {
             d.setUserId(p.getUserId());
             d.setTitle(p.getTitle());
             d.setContent(p.getContent());
-            d.setMediaUrls(p.getMediaUrls());
+            d.setMediaUrls(parseMediaUrls(p.getMediaUrls()));
             d.setViewCount(p.getViewCount());
             d.setLikeCount(p.getLikeCount());
             d.setCommentCount(p.getCommentCount());
@@ -83,7 +84,8 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDTO getById(Integer id) {
         Post p = postMapper.selectById(id);
-        if (p == null || p.getReviewStatus() != ReviewStatus.APPROVED) return null;
+        if (p == null || p.getReviewStatus() != ReviewStatus.APPROVED)
+            return null;
         p.setViewCount((p.getViewCount() == null ? 0 : p.getViewCount()) + 1);
         postMapper.updateById(p);
         return toDTO(p);
@@ -95,7 +97,7 @@ public class PostServiceImpl implements PostService {
         p.setUserId(userId);
         p.setTitle(req.getTitle());
         p.setContent(req.getContent());
-        p.setMediaUrls(req.getMediaUrls());
+        p.setMediaUrls(serializeMediaUrls(req.getMediaUrls()));
         p.setViewCount(0);
         p.setLikeCount(0);
         p.setCommentCount(0);
@@ -108,25 +110,37 @@ public class PostServiceImpl implements PostService {
     @Override
     public void update(Integer userId, Integer id, UpdatePostRequest req) {
         Post p = postMapper.selectById(id);
-        if (p == null) throw new IllegalStateException("帖子不存在");
-        if (!p.getUserId().equals(userId)) throw new IllegalStateException("无权修改该帖子");
-        if (req.getTitle() != null) p.setTitle(req.getTitle());
-        if (req.getContent() != null) p.setContent(req.getContent());
-        if (req.getMediaUrls() != null) p.setMediaUrls(req.getMediaUrls());
+        if (p == null)
+            throw new IllegalStateException("帖子不存在");
+        if (!p.getUserId().equals(userId))
+            throw new IllegalStateException("无权修改该帖子");
+        if (req.getTitle() != null)
+            p.setTitle(req.getTitle());
+        if (req.getContent() != null)
+            p.setContent(req.getContent());
+        if (req.getMediaUrls() != null)
+            p.setMediaUrls(serializeMediaUrls(req.getMediaUrls()));
+        p.setReviewStatus(cn.fzu.edu.furever_home.common.enums.ReviewStatus.PENDING);
         postMapper.updateById(p);
+        reviewService.createPending(cn.fzu.edu.furever_home.common.enums.ReviewTargetType.POST, p.getPostId());
     }
 
     @Override
     public void delete(Integer userId, Integer id) {
         Post p = postMapper.selectById(id);
-        if (p == null) return;
-        if (!p.getUserId().equals(userId)) throw new IllegalStateException("无权删除该帖子");
+        if (p == null)
+            return;
+        if (!p.getUserId().equals(userId))
+            throw new IllegalStateException("无权删除该帖子");
         postMapper.deleteById(id);
     }
 
     @Override
-    public cn.fzu.edu.furever_home.common.result.PageResult<cn.fzu.edu.furever_home.post.dto.PostCommentDTO> listComments(Integer postId, int page, int pageSize, cn.fzu.edu.furever_home.post.enums.CommentSortBy sortBy, cn.fzu.edu.furever_home.post.enums.SortOrder order) {
-        com.baomidou.mybatisplus.extension.plugins.pagination.Page<Comment> mpPage = new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(page, pageSize);
+    public cn.fzu.edu.furever_home.common.result.PageResult<cn.fzu.edu.furever_home.post.dto.PostCommentDTO> listComments(
+            Integer postId, int page, int pageSize, cn.fzu.edu.furever_home.post.enums.CommentSortBy sortBy,
+            cn.fzu.edu.furever_home.post.enums.SortOrder order) {
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<Comment> mpPage = new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(
+                page, pageSize);
         LambdaQueryWrapper<Comment> wrapper = new LambdaQueryWrapper<Comment>()
                 .eq(Comment::getPostId, postId);
         boolean asc = order == null || order == cn.fzu.edu.furever_home.post.enums.SortOrder.ASC;
@@ -135,31 +149,36 @@ public class PostServiceImpl implements PostService {
         } else {
             wrapper.orderBy(true, asc, Comment::getCreateTime).orderBy(true, asc, Comment::getLikeCount);
         }
-        com.baomidou.mybatisplus.extension.plugins.pagination.Page<Comment> result = commentMapper.selectPage(mpPage, wrapper);
-        java.util.List<cn.fzu.edu.furever_home.post.dto.PostCommentDTO> records = result.getRecords().stream().map(c -> {
-            cn.fzu.edu.furever_home.post.dto.PostCommentDTO dto = new cn.fzu.edu.furever_home.post.dto.PostCommentDTO();
-            dto.setCommentId(c.getCommentId());
-            dto.setParentCommentId(c.getParentCommentId());
-            dto.setContent(c.getContent());
-            dto.setLikeCount(c.getLikeCount());
-            dto.setCreateTime(c.getCreateTime());
-            dto.setUserId(c.getUserId());
-            User u = c.getUserId() == null ? null : userMapper.selectById(c.getUserId());
-            dto.setUserName(u == null ? null : u.getUserName());
-            return dto;
-        }).toList();
-        return new cn.fzu.edu.furever_home.common.result.PageResult<>(result.getCurrent(), result.getSize(), result.getTotal(), records);
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<Comment> result = commentMapper.selectPage(mpPage,
+                wrapper);
+        java.util.List<cn.fzu.edu.furever_home.post.dto.PostCommentDTO> records = result.getRecords().stream()
+                .map(c -> {
+                    cn.fzu.edu.furever_home.post.dto.PostCommentDTO dto = new cn.fzu.edu.furever_home.post.dto.PostCommentDTO();
+                    dto.setCommentId(c.getCommentId());
+                    dto.setParentCommentId(c.getParentCommentId());
+                    dto.setContent(c.getContent());
+                    dto.setLikeCount(c.getLikeCount());
+                    dto.setCreateTime(c.getCreateTime());
+                    dto.setUserId(c.getUserId());
+                    User u = c.getUserId() == null ? null : userMapper.selectById(c.getUserId());
+                    dto.setUserName(u == null ? null : u.getUserName());
+                    return dto;
+                }).toList();
+        return new cn.fzu.edu.furever_home.common.result.PageResult<>(result.getCurrent(), result.getSize(),
+                result.getTotal(), records);
     }
 
     @Override
     public boolean toggleCommentLike(Integer userId, Integer commentId) {
         Comment c = commentMapper.selectById(commentId);
-        if (c == null) throw new IllegalStateException("评论不存在");
-        Like existing = likeMapper.selectOne(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Like>()
-                .eq(Like::getUserId, userId)
-                .eq(Like::getKind, "评论")
-                .eq(Like::getTargetId, commentId)
-                .last("limit 1"));
+        if (c == null)
+            throw new IllegalStateException("评论不存在");
+        Like existing = likeMapper
+                .selectOne(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Like>()
+                        .eq(Like::getUserId, userId)
+                        .eq(Like::getKind, "评论")
+                        .eq(Like::getTargetId, commentId)
+                        .last("limit 1"));
         boolean liked;
         if (existing != null) {
             likeMapper.deleteById(existing.getLikeId());
@@ -186,11 +205,12 @@ public class PostServiceImpl implements PostService {
         return c == null ? null : c.getLikeCount();
     }
 
-
     @Override
-    public Integer submitComment(Integer userId, Integer postId, cn.fzu.edu.furever_home.post.request.SubmitCommentRequest req) {
+    public Integer submitComment(Integer userId, Integer postId,
+            cn.fzu.edu.furever_home.post.request.SubmitCommentRequest req) {
         Post p = postMapper.selectById(postId);
-        if (p == null || p.getReviewStatus() != ReviewStatus.APPROVED) throw new IllegalStateException("帖子不存在或未发布");
+        if (p == null || p.getReviewStatus() != ReviewStatus.APPROVED)
+            throw new IllegalStateException("帖子不存在或未发布");
         Comment c = new Comment();
         c.setPostId(postId);
         c.setUserId(userId);
@@ -221,7 +241,7 @@ public class PostServiceImpl implements PostService {
             d.setUserId(p.getUserId());
             d.setTitle(p.getTitle());
             d.setContent(p.getContent());
-            d.setMediaUrls(p.getMediaUrls());
+            d.setMediaUrls(parseMediaUrls(p.getMediaUrls()));
             d.setViewCount(p.getViewCount());
             d.setLikeCount(p.getLikeCount());
             d.setCommentCount(p.getCommentCount());
@@ -236,12 +256,14 @@ public class PostServiceImpl implements PostService {
     @Override
     public boolean toggleLike(Integer userId, Integer postId) {
         Post p = postMapper.selectById(postId);
-        if (p == null || p.getReviewStatus() != ReviewStatus.APPROVED) throw new IllegalStateException("帖子不存在或未发布");
-        Like existing = likeMapper.selectOne(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Like>()
-                .eq(Like::getUserId, userId)
-                .eq(Like::getKind, "帖子")
-                .eq(Like::getTargetId, postId)
-                .last("limit 1"));
+        if (p == null || p.getReviewStatus() != ReviewStatus.APPROVED)
+            throw new IllegalStateException("帖子不存在或未发布");
+        Like existing = likeMapper
+                .selectOne(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Like>()
+                        .eq(Like::getUserId, userId)
+                        .eq(Like::getKind, "帖子")
+                        .eq(Like::getTargetId, postId)
+                        .last("limit 1"));
         boolean liked;
         if (existing != null) {
             likeMapper.deleteById(existing.getLikeId());
@@ -269,18 +291,49 @@ public class PostServiceImpl implements PostService {
     }
 
     private PostDTO toDTO(Post p) {
-        if (p == null) return null;
+        if (p == null)
+            return null;
         PostDTO d = new PostDTO();
         d.setPostId(p.getPostId());
         d.setUserId(p.getUserId());
+        User u = p.getUserId() == null ? null : userMapper.selectById(p.getUserId());
+        d.setUserAvatar(u == null ? null : u.getAvatarUrl());
         d.setTitle(p.getTitle());
         d.setContent(p.getContent());
         d.setReviewStatus(p.getReviewStatus());
-        d.setMediaUrls(p.getMediaUrls());
+        d.setMediaUrls(parseMediaUrls(p.getMediaUrls()));
         d.setViewCount(p.getViewCount());
         d.setLikeCount(p.getLikeCount());
         d.setCommentCount(p.getCommentCount());
         d.setCreateTime(p.getCreateTime());
         return d;
+    }
+
+    private java.util.List<String> parseMediaUrls(String mediaUrlsJson) {
+        if (mediaUrlsJson == null || mediaUrlsJson.isBlank()) {
+            return java.util.Collections.emptyList();
+        }
+        String s = mediaUrlsJson.trim();
+        if (s.startsWith("[") && s.endsWith("]")) {
+            s = s.substring(1, s.length() - 1);
+        }
+        if (s.isBlank()) {
+            return java.util.Collections.emptyList();
+        }
+        return java.util.Arrays.stream(s.split(","))
+                .map(String::trim)
+                .map(v -> v.replaceAll("^\"|\"$", ""))
+                .filter(v -> !v.isBlank())
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    private String serializeMediaUrls(java.util.List<String> urls) {
+        if (urls == null || urls.isEmpty()) {
+            return "[]";
+        }
+        return "[" + urls.stream()
+                .filter(u -> u != null && !u.isBlank())
+                .map(u -> "\"" + u.replace("\"", "\\\"") + "\"")
+                .collect(java.util.stream.Collectors.joining(",")) + "]";
     }
 }

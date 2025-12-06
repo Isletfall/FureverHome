@@ -32,7 +32,7 @@ public class ChatServiceImpl implements ChatService {
     private final MessageMapper messageMapper;
     private final UserMapper userMapper;
     private final StringRedisTemplate stringRedisTemplate;
-    private final cn.fzu.edu.furever_home.chat.ws.ChatWebSocketSessionManager wsSessionManager;
+    private final cn.fzu.edu.furever_home.ws.WebSocketSessionManager wsSessionManager;
     private final ObjectMapper objectMapper;
     private static final Logger log = LoggerFactory.getLogger(ChatServiceImpl.class);
 
@@ -62,7 +62,8 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public PageResult<MessageDTO> listMessages(Integer userId, Integer conversationId, int page, int pageSize, Integer beforeMessageId) {
+    public PageResult<MessageDTO> listMessages(Integer userId, Integer conversationId, int page, int pageSize,
+            Integer beforeMessageId) {
         LambdaQueryWrapper<Message> wrapper = new LambdaQueryWrapper<Message>()
                 .eq(Message::getChatId, conversationId);
         if (beforeMessageId != null) {
@@ -86,7 +87,8 @@ public class ChatServiceImpl implements ChatService {
             dto.setCreatedAt(m.getCreateTime());
             return dto;
         }).collect(Collectors.toList());
-        long total = messageMapper.selectCount(new LambdaQueryWrapper<Message>().eq(Message::getChatId, conversationId));
+        long total = messageMapper
+                .selectCount(new LambdaQueryWrapper<Message>().eq(Message::getChatId, conversationId));
         boolean hasMore = !records.isEmpty() && (messageMapper.selectCount(new LambdaQueryWrapper<Message>()
                 .eq(Message::getChatId, conversationId)
                 .lt(Message::getMessageId, records.get(records.size() - 1).getMessageId())) > 0);
@@ -155,7 +157,8 @@ public class ChatServiceImpl implements ChatService {
             String uText = objectMapper.writeValueAsString(uPayload);
             log.info("WS event unread_count -> userId={} payload={}", receiverId, uText);
             wsSessionManager.sendToUser(receiverId, uText);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         return dto;
     }
 
@@ -166,7 +169,8 @@ public class ChatServiceImpl implements ChatService {
             setLastReadId(userId, conversationId, last.getMessageId());
             Chat c = chatMapper.selectById(conversationId);
             if (c != null) {
-                Integer otherId = java.util.Objects.equals(c.getCreatorId(), userId) ? c.getReceiverId() : c.getCreatorId();
+                Integer otherId = java.util.Objects.equals(c.getCreatorId(), userId) ? c.getReceiverId()
+                        : c.getCreatorId();
                 try {
                     java.util.Map<String, Object> payload = new java.util.HashMap<>();
                     payload.put("type", "read");
@@ -178,7 +182,8 @@ public class ChatServiceImpl implements ChatService {
                     String text = objectMapper.writeValueAsString(payload);
                     log.info("WS event read -> userId={} payload={}", otherId, text);
                     wsSessionManager.sendToUser(otherId, text);
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         }
     }
@@ -209,7 +214,8 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public Integer totalUnread(Integer userId) {
-        List<Chat> chats = chatMapper.selectList(new LambdaQueryWrapper<Chat>().eq(Chat::getCreatorId, userId).or().eq(Chat::getReceiverId, userId));
+        List<Chat> chats = chatMapper.selectList(
+                new LambdaQueryWrapper<Chat>().eq(Chat::getCreatorId, userId).or().eq(Chat::getReceiverId, userId));
         long sum = 0L;
         for (Chat c : chats) {
             Long cnt = countUnread(userId, c.getChatId());
@@ -230,8 +236,13 @@ public class ChatServiceImpl implements ChatService {
 
     private Integer getLastReadId(Integer userId, Integer conversationId) {
         String v = stringRedisTemplate.opsForValue().get(lastReadKey(userId, conversationId));
-        if (v == null || v.isBlank()) return null;
-        try { return Integer.parseInt(v); } catch (Exception ignored) { return null; }
+        if (v == null || v.isBlank())
+            return null;
+        try {
+            return Integer.parseInt(v);
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 
     private void setLastReadId(Integer userId, Integer conversationId, Integer messageId) {
@@ -240,7 +251,8 @@ public class ChatServiceImpl implements ChatService {
 
     private Long countUnread(Integer userId, Integer conversationId) {
         Integer lastReadId = getLastReadId(userId, conversationId);
-        if (lastReadId == null) lastReadId = 0;
+        if (lastReadId == null)
+            lastReadId = 0;
         return messageMapper.countUnread(conversationId, userId, lastReadId);
     }
 }

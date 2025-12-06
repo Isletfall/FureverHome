@@ -12,6 +12,8 @@ public class AnimalPublicDTO {
     private Integer animalId;
     @Schema(description = "发布用户ID")
     private Integer userId;
+    @Schema(description = "发布用户头像URL")
+    private String userAvatar;
     @Schema(description = "动物名称")
     private String animalName;
     @Schema(description = "照片URL列表（JSON数组）")

@@ -139,4 +139,31 @@ public class AuthServiceImpl implements AuthService {
         userMapper.updateById(u);
         stringRedisTemplate.delete(key);
     }
+
+    @Override
+    public void sendLoginCode(String email) {
+        User u = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getEmail, email));
+        if (u == null) {
+            throw new IllegalStateException("邮箱未注册");
+        }
+        String code = String.valueOf(100000 + new Random().nextInt(900000));
+        String key = "login:email:" + email;
+        stringRedisTemplate.opsForValue().set(key, code, Duration.ofMinutes(10));
+        emailSender.sendVerificationCode(email, code, fromEmail);
+    }
+
+    @Override
+    public User loginWithEmailCode(String email, String code) {
+        String key = "login:email:" + email;
+        String cached = stringRedisTemplate.opsForValue().get(key);
+        if (cached == null || !cached.equals(code)) {
+            throw new IllegalStateException("验证码无效或已过期");
+        }
+        User u = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getEmail, email));
+        if (u == null) {
+            throw new IllegalStateException("邮箱未注册");
+        }
+        stringRedisTemplate.delete(key);
+        return u;
+    }
 }

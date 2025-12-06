@@ -35,6 +35,7 @@ public class AdminPostServiceImpl implements AdminPostService {
     private final CommentMapper commentMapper;
     private final ReviewMapper reviewMapper;
     private final UserMapper userMapper;
+    private final cn.fzu.edu.furever_home.notify.service.NotificationService notificationService;
 
     @Override
     public PageResult<AdminPostSummaryDTO> listPending(int page, int pageSize, String keyword) {
@@ -228,6 +229,9 @@ public class AdminPostServiceImpl implements AdminPostService {
         if (affected == 0) {
             throw new IllegalStateException("帖子状态已变化，请刷新后重试");
         }
+        Integer recipientId = current.getUserId();
+        String event = status == cn.fzu.edu.furever_home.common.enums.ReviewStatus.APPROVED ? "通过" : "拒绝";
+        notificationService.notifyActivity(recipientId, reviewerId, "post", postId, event, null, reason, null);
     }
 
     private int safeInt(Integer v) {

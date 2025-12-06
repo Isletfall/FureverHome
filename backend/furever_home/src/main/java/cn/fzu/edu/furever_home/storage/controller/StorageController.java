@@ -28,7 +28,8 @@ public class StorageController {
     @PostMapping(value = "/upload/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "上传图片", description = "返回可直接查看的服务路由")
     @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
-    public Result<String> uploadImage(@RequestPart("file") MultipartFile file, MultipartHttpServletRequest multipartRequest) {
+    public Result<String> uploadImage(@RequestPart("file") MultipartFile file,
+            MultipartHttpServletRequest multipartRequest) {
         if (multipartRequest != null) {
             java.util.List<MultipartFile> files = multipartRequest.getFiles("file");
             if (files != null && files.size() > 1) {
@@ -41,15 +42,18 @@ public class StorageController {
         String ct = file.getContentType();
         String name = file.getOriginalFilename();
         boolean isPng = ct != null && ct.equalsIgnoreCase(org.springframework.http.MediaType.IMAGE_PNG_VALUE);
-        boolean isJpeg = ct != null && (ct.equalsIgnoreCase(org.springframework.http.MediaType.IMAGE_JPEG_VALUE) || ct.equalsIgnoreCase("image/jpg"));
-        if (!isPng && !isJpeg) {
+        boolean isJpeg = ct != null && (ct.equalsIgnoreCase(org.springframework.http.MediaType.IMAGE_JPEG_VALUE)
+                || ct.equalsIgnoreCase("image/jpg"));
+        boolean isWebp = ct != null && ct.equalsIgnoreCase("image/webp");
+        if (!isPng && !isJpeg && !isWebp) {
             boolean byExt = false;
             if (name != null) {
                 String lower = name.toLowerCase();
-                byExt = lower.endsWith(".png") || lower.endsWith(".jpg") || lower.endsWith(".jpeg");
+                byExt = lower.endsWith(".png") || lower.endsWith(".jpg") || lower.endsWith(".jpeg")
+                        || lower.endsWith(".webp");
             }
             if (!byExt) {
-                return Result.error(400, "仅支持 PNG 或 JPG 图片");
+                return Result.error(400, "仅支持 PNG、JPG 或 WEBP 图片");
             }
         }
         String bucket = env.getProperty("minio.bucket-images", "images");
@@ -61,7 +65,8 @@ public class StorageController {
     @PostMapping(value = "/upload/video", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "上传视频", description = "返回可直接查看的服务路由")
     @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
-    public Result<String> uploadVideo(@RequestPart("file") MultipartFile file, MultipartHttpServletRequest multipartRequest) {
+    public Result<String> uploadVideo(@RequestPart("file") MultipartFile file,
+            MultipartHttpServletRequest multipartRequest) {
         if (multipartRequest != null) {
             java.util.List<MultipartFile> files = multipartRequest.getFiles("file");
             if (files != null && files.size() > 1) {
@@ -87,7 +92,8 @@ public class StorageController {
 
     @GetMapping("/image/{object}")
     @Operation(summary = "查看图片")
-    public ResponseEntity<byte[]> viewImage(@Parameter(description = "图片对象名") @PathVariable("object") String objectName) {
+    public ResponseEntity<byte[]> viewImage(
+            @Parameter(description = "图片对象名") @PathVariable("object") String objectName) {
         String bucket = env.getProperty("minio.bucket-images", "images");
         cn.fzu.edu.furever_home.storage.dto.FileObject f = storageService.getFile(bucket, objectName);
         return ResponseEntity.ok()
@@ -99,7 +105,8 @@ public class StorageController {
 
     @GetMapping("/video/{object}")
     @Operation(summary = "查看视频（支持分段）")
-    public ResponseEntity<StreamingResponseBody> viewVideo(@Parameter(description = "视频对象名") @PathVariable("object") String objectName,
+    public ResponseEntity<StreamingResponseBody> viewVideo(
+            @Parameter(description = "视频对象名") @PathVariable("object") String objectName,
             @RequestHeader(value = "Range", required = false) String range, HttpServletResponse response) {
         String bucket = env.getProperty("minio.bucket-videos", "videos");
         Long start = null;

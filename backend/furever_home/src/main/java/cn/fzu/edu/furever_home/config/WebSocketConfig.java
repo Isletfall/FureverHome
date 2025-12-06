@@ -1,6 +1,6 @@
 package cn.fzu.edu.furever_home.config;
 
-import cn.fzu.edu.furever_home.chat.ws.ChatWebSocketHandler;
+import cn.fzu.edu.furever_home.ws.CommonWebSocketHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -12,10 +12,10 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSocket
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketConfigurer {
-    private final ChatWebSocketHandler chatWebSocketHandler;
+    private final CommonWebSocketHandler commonWebSocketHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(chatWebSocketHandler, "/api/ws/chat").setAllowedOrigins("*");
+        registry.addHandler(commonWebSocketHandler, "/api/ws/common").setAllowedOrigins("*");
     }
 }

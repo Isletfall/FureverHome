@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import cn.fzu.edu.furever_home.user.dto.UserDTO;
+import cn.fzu.edu.furever_home.user.dto.UserStatsDTO;
 import cn.fzu.edu.furever_home.user.request.UpdateUserRequest;
 import cn.fzu.edu.furever_home.user.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,15 @@ public class UserController {
     @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
     public Result<UserDTO> getById(@PathVariable Integer id) {
         UserDTO dto = userProfileService.getById(id);
+        return Result.success(dto);
+    }
+
+    @GetMapping("/me/stats")
+    @Operation(summary = "获取我的统计数据")
+    @Parameter(name = "Authorization", description = "认证令牌，格式为: Bearer {token}", in = ParameterIn.HEADER, required = false, example = "Bearer {{token}}")
+    public Result<UserStatsDTO> myStats() {
+        Integer uid = StpUtil.getLoginIdAsInt();
+        UserStatsDTO dto = userProfileService.getMyStats(uid);
         return Result.success(dto);
     }
 }

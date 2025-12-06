@@ -26,4 +26,8 @@ public class Adopt {
     private LocalDateTime createTime;
     private LocalDateTime passTime;
     private ReviewStatus reviewStatus;
+    private Boolean isDeleted;
+    private LocalDateTime deletedAt;
+    private Boolean isCancelled;
+    private LocalDateTime cancelledAt;
 }

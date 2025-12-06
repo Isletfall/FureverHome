@@ -83,5 +83,3 @@ public class AdminAdoptController {
         return Result.success();
     }
 }
-
-

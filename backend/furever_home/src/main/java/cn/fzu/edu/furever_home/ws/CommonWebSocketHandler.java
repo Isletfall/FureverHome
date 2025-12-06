@@ -1,12 +1,13 @@
-package cn.fzu.edu.furever_home.chat.ws;
+package cn.fzu.edu.furever_home.ws;
 
 import cn.dev33.satoken.stp.StpUtil;
-import lombok.RequiredArgsConstructor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.JsonNode;
 import cn.fzu.edu.furever_home.chat.mapper.ChatMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -19,11 +20,12 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class ChatWebSocketHandler extends TextWebSocketHandler {
-    private final ChatWebSocketSessionManager sessionManager;
+public class CommonWebSocketHandler extends TextWebSocketHandler {
+    private final cn.fzu.edu.furever_home.ws.WebSocketSessionManager sessionManager;
     private final ChatMapper chatMapper;
     private final ObjectMapper objectMapper;
-    private static final Logger log = LoggerFactory.getLogger(ChatWebSocketHandler.class);
+    private final StringRedisTemplate stringRedisTemplate;
+    private static final Logger log = LoggerFactory.getLogger(CommonWebSocketHandler.class);
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -35,6 +37,15 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         session.getAttributes().put("uid", uid);
         sessionManager.register(uid, session);
         log.info("WS connected uid={} sessionId={}", uid, session.getId());
+        try {
+            String key = "notify:pending:" + uid;
+            String text;
+            // 逐个弹出并推送离线未送达的提醒
+            while ((text = stringRedisTemplate.opsForList().rightPop(key)) != null) {
+                sessionManager.sendToUser(uid, text);
+            }
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
@@ -49,21 +60,25 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
         Object v = session.getAttributes().get("uid");
-        if (!(v instanceof Integer)) return;
+        if (!(v instanceof Integer))
+            return;
         Integer uid = (Integer) v;
         String payload = message.getPayload();
         try {
             JsonNode root = objectMapper.readTree(payload);
             JsonNode t = root.get("type");
-            if (t == null || !t.isTextual()) return;
+            if (t == null || !t.isTextual())
+                return;
             String type = t.asText();
             if ("typing".equals(type)) {
                 JsonNode cidNode = root.get("conversationId");
                 JsonNode actionNode = root.get("action");
-                if (cidNode == null || !cidNode.isInt()) return;
+                if (cidNode == null || !cidNode.isInt())
+                    return;
                 Integer conversationId = cidNode.asInt();
                 Integer targetId = findTargetUserId(conversationId, uid);
-                if (targetId == null) return;
+                if (targetId == null)
+                    return;
                 java.util.Map<String, Object> out = new java.util.HashMap<>();
                 out.put("type", "typing");
                 java.util.Map<String, Object> data = new java.util.HashMap<>();
@@ -75,17 +90,21 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 log.info("WS event typing from uid={} to userId={} payload={}", uid, targetId, text);
                 sessionManager.sendToUser(targetId, text);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     private Integer parseAndAuth(URI uri) {
-        if (uri == null || uri.getQuery() == null) return null;
+        if (uri == null || uri.getQuery() == null)
+            return null;
         Map<String, String> q = parseQuery(uri.getQuery());
         String token = q.get("token");
-        if (token == null || token.isBlank()) return null;
+        if (token == null || token.isBlank())
+            return null;
         try {
             Object id = StpUtil.getLoginIdByToken(token);
-            if (id == null) return null;
+            if (id == null)
+                return null;
             return Integer.parseInt(id.toString());
         } catch (Exception e) {
             return null;
@@ -94,8 +113,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     private Integer findTargetUserId(Integer conversationId, Integer currentUserId) {
         cn.fzu.edu.furever_home.chat.entity.Chat c = chatMapper.selectById(conversationId);
-        if (c == null) return null;
-        if (java.util.Objects.equals(c.getCreatorId(), currentUserId)) return c.getReceiverId();
+        if (c == null)
+            return null;
+        if (java.util.Objects.equals(c.getCreatorId(), currentUserId))
+            return c.getReceiverId();
         return c.getCreatorId();
     }
 
@@ -112,3 +133,4 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         return m;
     }
 }
+

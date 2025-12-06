@@ -3,6 +3,7 @@ package cn.fzu.edu.furever_home.post.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -17,6 +18,6 @@ public class CreatePostRequest {
     @NotBlank
     private String content;
 
-    @Schema(description = "图片链接")
-    private String mediaUrls;
+    @Schema(description = "图片链接列表（JSON数组）", example = "[\"https://img.example.com/a.jpg\",\"https://img.example.com/b.jpg\"]")
+    private List<String> mediaUrls;
 }

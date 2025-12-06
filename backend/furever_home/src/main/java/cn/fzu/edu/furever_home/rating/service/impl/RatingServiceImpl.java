@@ -14,6 +14,7 @@ import cn.fzu.edu.furever_home.rating.mapper.RatingMapper;
 import cn.fzu.edu.furever_home.rating.service.RatingService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,7 +26,8 @@ public class RatingServiceImpl implements RatingService {
     private final AnimalMapper animalMapper;
     private final UserMapper userMapper;
 
-    public RatingServiceImpl(RatingMapper ratingMapper, AdoptMapper adoptMapper, AnimalMapper animalMapper, UserMapper userMapper) {
+    public RatingServiceImpl(RatingMapper ratingMapper, AdoptMapper adoptMapper, AnimalMapper animalMapper,
+            UserMapper userMapper) {
         this.ratingMapper = ratingMapper;
         this.adoptMapper = adoptMapper;
         this.animalMapper = animalMapper;
@@ -56,8 +58,10 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     public MyRatingDTO getMyRatingFor(Integer userId, Integer targetUserId) {
-        Rating r = ratingMapper.selectOne(new LambdaQueryWrapper<Rating>().eq(Rating::getTargetUserId, targetUserId).eq(Rating::getUserId, userId));
-        if (r == null) return null;
+        Rating r = ratingMapper.selectOne(new LambdaQueryWrapper<Rating>().eq(Rating::getTargetUserId, targetUserId)
+                .eq(Rating::getUserId, userId));
+        if (r == null)
+            return null;
         MyRatingDTO d = new MyRatingDTO();
         d.setRatingId(r.getRatingId());
         d.setScore(r.getScore());
@@ -67,8 +71,10 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     public void addMyRating(Integer userId, Integer targetUserId, Integer score, String content) {
-        if (score == null || score < 1 || score > 5) throw new IllegalArgumentException("评分需在1-5之间");
-        Rating exists = ratingMapper.selectOne(new LambdaQueryWrapper<Rating>().eq(Rating::getUserId, userId).eq(Rating::getTargetUserId, targetUserId));
+        if (score == null || score < 1 || score > 5)
+            throw new IllegalArgumentException("评分需在1-5之间");
+        Rating exists = ratingMapper.selectOne(new LambdaQueryWrapper<Rating>().eq(Rating::getUserId, userId)
+                .eq(Rating::getTargetUserId, targetUserId));
         if (exists != null) {
             throw new IllegalStateException("已存在评价，请使用修改接口");
         }
@@ -80,16 +86,32 @@ public class RatingServiceImpl implements RatingService {
         r.setContent(content);
         r.setCreateTime(java.time.LocalDateTime.now());
         ratingMapper.insert(r);
+
+        userMapper.update(null, new LambdaUpdateWrapper<User>()
+                .eq(User::getUserId, targetUserId)
+                .setSql("credit_score = COALESCE(credit_score, 0) + " + score)
+                .setSql("credit_score_count = COALESCE(credit_score_count, 0) + 1")
+                .set(User::getUpdatedAt, java.time.LocalDateTime.now()));
     }
 
     @Override
     public void updateMyRating(Integer userId, Integer targetUserId, Integer ratingId, Integer score, String content) {
+        if (score == null || score < 1 || score > 5)
+            throw new IllegalArgumentException("评分需在1-5之间");
         Rating r = ratingMapper.selectById(ratingId);
-        if (r == null || !userId.equals(r.getUserId())) return;
+        if (r == null || !userId.equals(r.getUserId()))
+            return;
+        Integer oldScore = r.getScore();
         r.setScore(score);
         r.setContent(content);
         ratingMapper.updateById(r);
-    }
 
-    // 允许所有人评价，无需领养关系
+        int old = oldScore == null ? 0 : oldScore;
+        int now = score;
+        Integer target = r.getTargetUserId();
+        userMapper.update(null, new LambdaUpdateWrapper<User>()
+                .eq(User::getUserId, target == null ? targetUserId : target)
+                .setSql("credit_score = COALESCE(credit_score, 0) - " + old + " + " + now)
+                .set(User::getUpdatedAt, java.time.LocalDateTime.now()));
+    }
 }

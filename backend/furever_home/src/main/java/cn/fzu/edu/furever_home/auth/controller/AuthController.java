@@ -3,13 +3,14 @@ package cn.fzu.edu.furever_home.auth.controller;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
 import cn.fzu.edu.furever_home.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import cn.fzu.edu.furever_home.auth.entity.User;
 import cn.fzu.edu.furever_home.auth.request.LoginRequest;
+import cn.fzu.edu.furever_home.auth.request.LoginSendCodeRequest;
+import cn.fzu.edu.furever_home.auth.request.LoginConfirmRequest;
+import cn.fzu.edu.furever_home.auth.dto.AuthLoginDTO;
 import cn.fzu.edu.furever_home.auth.request.SendCodeRequest;
 import cn.fzu.edu.furever_home.auth.request.ConfirmRegisterRequest;
 import cn.fzu.edu.furever_home.auth.request.ResetPasswordSendCodeRequest;
@@ -28,7 +29,7 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(summary = "登录", description = "使用昵称或邮箱加密码登录")
-    public Result<Map<String, Object>> login(@RequestBody @Valid LoginRequest req) {
+    public Result<AuthLoginDTO> login(@RequestBody @Valid LoginRequest req) {
         User u = authService.findByAccount(req.getAccount());
         if (u == null)
             return Result.error(401, "账户不存在");
@@ -37,10 +38,10 @@ public class AuthController {
         StpUtil.login(u.getUserId());
         SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
         List<String> roles = StpUtil.getRoleList(u.getUserId());
-        Map<String, Object> data = new HashMap<>();
-        data.put("tokenInfo", tokenInfo);
-        data.put("roles", roles);
-        data.put("userName", u.getUserName());
+        AuthLoginDTO data = new AuthLoginDTO();
+        data.setTokenInfo(tokenInfo);
+        data.setRoles(roles);
+        data.setUserName(u.getUserName());
         return Result.success("登录成功", data);
     }
 
@@ -83,5 +84,26 @@ public class AuthController {
     public Result<String> resetPassword(@RequestBody @Valid ResetPasswordRequest req) {
         authService.resetPassword(req.getEmail(), req.getCode(), req.getNewPassword());
         return Result.success("操作成功", null);
+    }
+
+    @PostMapping("/login/send-code")
+    @Operation(summary = "发送登录验证码", description = "向邮箱发送登录验证码")
+    public Result<String> sendLoginCode(@RequestBody @Valid LoginSendCodeRequest req) {
+        authService.sendLoginCode(req.getEmail());
+        return Result.success("验证码已发送", null);
+    }
+
+    @PostMapping("/login/confirm")
+    @Operation(summary = "验证码登录", description = "校验验证码并登录")
+    public Result<AuthLoginDTO> loginConfirm(@RequestBody @Valid LoginConfirmRequest req) {
+        User u = authService.loginWithEmailCode(req.getEmail(), req.getCode());
+        StpUtil.login(u.getUserId());
+        SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+        List<String> roles = StpUtil.getRoleList(u.getUserId());
+        AuthLoginDTO data = new AuthLoginDTO();
+        data.setTokenInfo(tokenInfo);
+        data.setRoles(roles);
+        data.setUserName(u.getUserName());
+        return Result.success("登录成功", data);
     }
 }

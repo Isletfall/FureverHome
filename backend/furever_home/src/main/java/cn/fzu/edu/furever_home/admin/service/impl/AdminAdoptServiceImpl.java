@@ -12,6 +12,7 @@ import cn.fzu.edu.furever_home.auth.mapper.UserMapper;
 import cn.fzu.edu.furever_home.common.enums.ApplicationStatus;
 import cn.fzu.edu.furever_home.common.enums.ReviewStatus;
 import cn.fzu.edu.furever_home.common.enums.ReviewTargetType;
+import cn.fzu.edu.furever_home.common.enums.AdoptionStatus;
 import cn.fzu.edu.furever_home.common.result.PageResult;
 import cn.fzu.edu.furever_home.review.entity.Review;
 import cn.fzu.edu.furever_home.review.mapper.ReviewMapper;
@@ -35,11 +36,13 @@ public class AdminAdoptServiceImpl implements AdminAdoptService {
     private final AnimalMapper animalMapper;
     private final UserMapper userMapper;
     private final ReviewMapper reviewMapper;
+    private final cn.fzu.edu.furever_home.notify.service.NotificationService notificationService;
 
     @Override
     public PageResult<AdminAdoptSummaryDTO> listPending(int page, int pageSize, String keyword) {
         Page<Adopt> mpPage = new Page<>(page, pageSize);
         LambdaQueryWrapper<Adopt> wrapper = new LambdaQueryWrapper<Adopt>()
+                .eq(Adopt::getIsDeleted, false)
                 .eq(Adopt::getReviewStatus, ReviewStatus.PENDING)
                 .orderByAsc(Adopt::getAdoptId);
         if (keyword != null && !keyword.isBlank()) {
@@ -56,6 +59,7 @@ public class AdminAdoptServiceImpl implements AdminAdoptService {
     public PageResult<AdminAdoptSummaryDTO> listProcessed(int page, int pageSize, String keyword) {
         Page<Adopt> mpPage = new Page<>(page, pageSize);
         LambdaQueryWrapper<Adopt> wrapper = new LambdaQueryWrapper<Adopt>()
+                .eq(Adopt::getIsDeleted, false)
                 .ne(Adopt::getReviewStatus, ReviewStatus.PENDING)
                 .orderByAsc(Adopt::getAdoptId);
         // 处理已审核列表的关键字模糊查询（申请人姓名 / 宠物名称）
@@ -132,10 +136,10 @@ public class AdminAdoptServiceImpl implements AdminAdoptService {
 
         // 先根据关键字查出匹配的用户和宠物ID，再在申请记录里按 userId / animalId 过滤
         List<Integer> userIds = userMapper.selectList(
-                        new LambdaQueryWrapper<User>().like(User::getUserName, kw))
+                new LambdaQueryWrapper<User>().like(User::getUserName, kw))
                 .stream().map(User::getUserId).toList();
         List<Integer> animalIds = animalMapper.selectList(
-                        new LambdaQueryWrapper<Animal>().like(Animal::getAnimalName, kw))
+                new LambdaQueryWrapper<Animal>().like(Animal::getAnimalName, kw))
                 .stream().map(Animal::getAnimalId).toList();
 
         // 如果关键字可以解析成数字，则额外按 ID 维度进行匹配
@@ -215,7 +219,7 @@ public class AdminAdoptServiceImpl implements AdminAdoptService {
     }
 
     private void updateReviewAndAdoptStatus(Integer reviewerId, Integer adoptId, String reason,
-                                            ReviewStatus reviewStatus, ApplicationStatus applicationStatus) {
+            ReviewStatus reviewStatus, ApplicationStatus applicationStatus) {
         if (adoptId == null) {
             throw new IllegalArgumentException("adoptId 不能为空");
         }
@@ -223,6 +227,7 @@ public class AdminAdoptServiceImpl implements AdminAdoptService {
         Adopt current = adoptMapper.selectOne(
                 new LambdaQueryWrapper<Adopt>()
                         .eq(Adopt::getAdoptId, adoptId)
+                        .eq(Adopt::getIsDeleted, false)
                         .last("FOR UPDATE"));
         if (current == null) {
             throw new IllegalStateException("领养申请不存在");
@@ -237,42 +242,6 @@ public class AdminAdoptServiceImpl implements AdminAdoptService {
         ReviewStatus finalReviewStatus = reviewStatus;
         ApplicationStatus finalApplicationStatus = applicationStatus;
         String finalReason = reason;
-        boolean conflictAlreadyAdopted = false;
-        List<Integer> otherPendingIds = null;
-        String autoRejectReason = "该动物已被其他申请人成功领养";
-
-        if (reviewStatus == ReviewStatus.APPROVED && applicationStatus == ApplicationStatus.SUCCESS) {
-            // 锁定同一只动物的所有申请记录，避免并发场景下一只动物被多次通过
-            List<Adopt> sameAnimalAdopts = adoptMapper.selectList(
-                    new LambdaQueryWrapper<Adopt>()
-                            .eq(Adopt::getAnimalId, current.getAnimalId())
-                            .last("FOR UPDATE"));
-
-            // 是否已经存在其它「已通过」的申请
-            boolean hasOtherApproved = sameAnimalAdopts.stream()
-                    .anyMatch(a -> !a.getAdoptId().equals(current.getAdoptId())
-                            && a.getReviewStatus() == ReviewStatus.APPROVED
-                            && a.getApplicationStatus() == ApplicationStatus.SUCCESS);
-
-            if (hasOtherApproved) {
-                // 已经有别的申请通过了，本次申请不能再通过，直接按拒绝处理
-                conflictAlreadyAdopted = true;
-                finalReviewStatus = ReviewStatus.REJECTED;
-                finalApplicationStatus = ApplicationStatus.FAIL;
-                if (finalReason == null || finalReason.isBlank()) {
-                    finalReason = autoRejectReason;
-                } else {
-                    finalReason = finalReason.trim() + "；" + autoRejectReason;
-                }
-            } else {
-                // 当前这条作为首个通过的申请，其它待审核的同动物申请自动批量拒绝
-                otherPendingIds = sameAnimalAdopts.stream()
-                        .filter(a -> !a.getAdoptId().equals(current.getAdoptId())
-                                && a.getReviewStatus() == ReviewStatus.PENDING)
-                        .map(Adopt::getAdoptId)
-                        .toList();
-            }
-        }
 
         Review review = reviewMapper.selectOne(
                 new LambdaQueryWrapper<Review>()
@@ -288,40 +257,31 @@ public class AdminAdoptServiceImpl implements AdminAdoptService {
             }
             reviewMapper.updateById(review);
         }
+        // 管理员更新 review_status 与 pass_time
         LambdaUpdateWrapper<Adopt> updateWrapper = new LambdaUpdateWrapper<Adopt>()
                 .eq(Adopt::getAdoptId, adoptId)
                 .eq(Adopt::getReviewStatus, ReviewStatus.PENDING)
+                .eq(Adopt::getIsDeleted, false)
                 .set(Adopt::getReviewStatus, finalReviewStatus)
-                .set(Adopt::getApplicationStatus, finalApplicationStatus)
                 .set(Adopt::getPassTime, LocalDateTime.now());
         int affected = adoptMapper.update(null, updateWrapper);
         if (affected == 0) {
             throw new IllegalStateException("领养申请状态已变化，请刷新后重试");
         }
+        Integer reviewId = review == null ? null : review.getReviewId();
+        Integer recipientId = current.getUserId();
+        String event = finalReviewStatus == ReviewStatus.APPROVED ? "通过" : "拒绝";
+        notificationService.notifyActivity(recipientId, reviewerId, "adopt", adoptId,
+                event, null, finalReason, null);
 
-        // 如果当前是首个通过的申请，则自动将同一只动物的其他待审核申请批量拒绝
-        if (otherPendingIds != null && !otherPendingIds.isEmpty()) {
-            // 更新 adopt 表
-            adoptMapper.update(null, new LambdaUpdateWrapper<Adopt>()
-                    .in(Adopt::getAdoptId, otherPendingIds)
-                    .eq(Adopt::getReviewStatus, ReviewStatus.PENDING)
-                    .set(Adopt::getReviewStatus, ReviewStatus.REJECTED)
-                    .set(Adopt::getApplicationStatus, ApplicationStatus.FAIL)
-                    .set(Adopt::getPassTime, LocalDateTime.now()));
-
-            // 更新对应的 review 记录
-            reviewMapper.update(null, new LambdaUpdateWrapper<Review>()
-                    .eq(Review::getTargetType, ReviewTargetType.ADOPT)
-                    .in(Review::getTargetId, otherPendingIds)
-                    .set(Review::getStatus, ReviewStatus.REJECTED)
-                    .set(Review::getReviewerId, reviewerId)
-                    .set(Review::getReason, autoRejectReason));
+        if (finalReviewStatus == ReviewStatus.APPROVED && current.getAnimalId() != null) {
+            Animal animal = animalMapper.selectById(current.getAnimalId());
+            if (animal != null && animal.getUserId() != null) {
+                notificationService.notifyActivity(animal.getUserId(), reviewerId, "review",
+                        reviewId == null ? adoptId : reviewId, "新的待办事项", null, finalReason, null);
+            }
         }
 
-        // 如果发现该动物已经被其他申请人成功领养，则在更新当前记录为拒绝后抛出业务提示，让前端弹出友好信息
-        if (conflictAlreadyAdopted) {
-            throw new IllegalStateException("该动物已被其他申请人成功领养，不能再次通过该申请");
-        }
     }
 
     /**
@@ -335,5 +295,3 @@ public class AdminAdoptServiceImpl implements AdminAdoptService {
         }
     }
 }
-
-

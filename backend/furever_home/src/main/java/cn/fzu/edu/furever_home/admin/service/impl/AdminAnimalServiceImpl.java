@@ -30,6 +30,7 @@ public class AdminAnimalServiceImpl implements AdminAnimalService {
     private final AnimalMapper animalMapper;
     private final ReviewMapper reviewMapper;
     private final UserMapper userMapper;
+    private final cn.fzu.edu.furever_home.notify.service.NotificationService notificationService;
 
     @Override
     public PageResult<AdminAnimalSummaryDTO> listPending(int page, int pageSize, String keyword) {
@@ -223,6 +224,9 @@ public class AdminAnimalServiceImpl implements AdminAnimalService {
         if (affected == 0) {
             throw new IllegalStateException("宠物状态已变化，请刷新后重试");
         }
+        Integer recipientId = current.getUserId();
+        String event = status == cn.fzu.edu.furever_home.common.enums.ReviewStatus.APPROVED ? "通过" : "拒绝";
+        notificationService.notifyActivity(recipientId, reviewerId, "animal", animalId, event, null, reason, null);
     }
 
     /**

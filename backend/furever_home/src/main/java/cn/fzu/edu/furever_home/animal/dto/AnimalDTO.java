@@ -15,6 +15,8 @@ public class AnimalDTO {
     private Integer userId;
     @Schema(description = "发布用户昵称")
     private String userName;
+    @Schema(description = "发布用户头像URL")
+    private String userAvatar;
     @Schema(description = "发布者所在地")
     private String ownerLocation;
     @Schema(description = "发布者邮箱")
