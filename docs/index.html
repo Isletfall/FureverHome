@@ -1,75 +1,271 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FureverHome｜宠物领养平台</title>
-    <link rel="stylesheet" href="styles.css" />
-</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FUREVERHOME - 动物领养系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff9f43; /* 截图中的暖橙色 */
+            --bg-color: #fffbf5; /* 截图中的米白色背景 */
+            --text-dark: #333333;
+            --text-gray: #666666;
+            --white: #ffffff;
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #fffbf5 0%, #fff0e6 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        /* 容器样式 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 顶部 Hero 区域 */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 80px 0;
+            min-height: 60vh;
+        }
+
+        .hero-content {
+            flex: 1;
+            padding-right: 50px;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .hero-highlight {
+            color: var(--primary-color);
+        }
+
+        .hero-desc {
+            font-size: 1.1rem;
+            color: var(--text-gray);
+            margin-bottom: 40px;
+            line-height: 1.6;
+            max-width: 500px;
+        }
+
+        /* 按钮组 */
+        .btn-group {
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(255, 159, 67, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 159, 67, 0.6);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .hero-image {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            /* 这里使用截图中的猫咪占位，实际请替换为你的图片链接 */
+            width: 400px; 
+            height: auto;
+        }
+
+        /* 核心功能区域 */
+        .features {
+            padding: 60px 0 100px;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--text-gray);
+            margin-bottom: 50px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 3px;
+            background: var(--primary-color);
+            margin: 10px auto 0;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: var(--white);
+            padding: 40px 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+            border-top: 3px solid transparent;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-top: 3px solid var(--primary-color);
+        }
+
+        .icon-wrapper {
+            width: 60px;
+            height: 60px;
+            background: #fff5e6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+        }
+
+        .feature-card p {
+            font-size: 0.9rem;
+            color: #888;
+            line-height: 1.5;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column-reverse;
+                text-align: center;
+                padding-top: 40px;
+            }
+            .hero-content {
+                padding-right: 0;
+                margin-top: 30px;
+            }
+            .btn-group {
+                justify-content: center;
+            }
+            .hero-desc {
+                margin: 0 auto 30px;
+            }
+        }
+    </style>
+</head>
 <body>
 
-<header class="hero">
-    <div class="hero-content">
-        <h1>🐾 FureverHome</h1>
-        <p>一个更温暖、更可信的宠物领养平台</p>
-        <a href="#features" class="btn">开始探索</a>
+    <div class="container">
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">让每个小生命都有<br><span class="hero-highlight">温暖的家</span></h1>
+                <p class="hero-desc">
+                    FUREVERHOME 动物领养系统。连接流浪动物与有爱心的你。
+                    领养代替购买，让爱心循环，让生命不再流浪。
+                </p>
+                
+                <div class="btn-group">
+                    <a href="http://colltar.natapp1.cc/" target="_blank" class="btn btn-primary">
+                        <i class="fas fa-globe"></i> 访问演示网站
+                    </a>
+                    <a href="https://github.com/Isletfall/FureverHome" target="_blank" class="btn btn-secondary">
+                        <i class="fab fa-github"></i> 查看源码
+                    </a>
+                </div>
+            </div>
+            
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Cute Cat">
+            </div>
+        </section>
+
+        <section class="features">
+            <h2 class="section-title">核心功能</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="icon-wrapper"><i class="fas fa-list-ul"></i></div>
+                    <h3>宠物列表</h3>
+                    <p>浏览待领养/已领养宠物。支持多维度筛选与搜索，找到最适合你的小确幸。</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="icon-wrapper"><i class="fas fa-comments"></i></div>
+                    <h3>沟通对接</h3>
+                    <p>实时聊天，领养申请，进度通知，一键完成领养流程。</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="icon-wrapper"><i class="fas fa-users"></i></div>
+                    <h3>宠物论坛</h3>
+                    <p>分享日常，求助答疑，点赞评论，共建有爱社区。</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="icon-wrapper"><i class="fas fa-paw"></i></div>
+                    <h3>发布动物</h3>
+                    <p>快速发布流浪/救助动物，填写信息即刻上线。</p>
+                </div>
+            </div>
+        </section>
     </div>
-</header>
-
-<section id="intro" class="section">
-    <h2>关于 FureverHome</h2>
-    <p>
-        FureverHome 是一款面向爱宠人士的在线领养与交流平台。
-        我们提供从 <strong>发现宠物 → 申请领养 → 实时沟通 → 审核处理 → 信用评价</strong>
-        的完整闭环流程，让“领养代替购买”变得更可信、更简单。
-    </p>
-</section>
-
-<section id="features" class="section features">
-    <h2>🌟 核心亮点</h2>
-
-    <div class="feature-list">
-
-        <div class="feature-card">
-            <h3>🐶 高效领养流程</h3>
-            <p>一键申请、实时沟通，全流程状态同步，操作简单顺畅。</p>
-        </div>
-
-        <div class="feature-card">
-            <h3>🏠 支持短期寄养</h3>
-            <p>发布寄养需求与处理申请，让更多动物获得临时关爱。</p>
-        </div>
-
-        <div class="feature-card">
-            <h3>💬 宠物社区互动</h3>
-            <p>分享日常、求助答疑，与养宠同好交流故事与经验。</p>
-        </div>
-
-        <div class="feature-card">
-            <h3>⭐ 信用与评价体系</h3>
-            <p>领养双方互评，构建公开透明的信用档案，让选择更安心。</p>
-        </div>
-
-        <div class="feature-card">
-            <h3>🛠️ 专业后台审核</h3>
-            <p>所有内容与申请均有严格审核，为平台安全保驾护航。</p>
-        </div>
-
-    </div>
-</section>
-
-<section id="vision" class="section">
-    <h2>💡 我们的理念</h2>
-    <p>
-        让领养流程更透明，让社区交流更温暖，让信任在平台中流动。<br><br>
-        <strong>FureverHome —— 让每一次领养，都从爱与信任开始。</strong>
-    </p>
-</section>
-
-<footer class="footer">
-    <p>© 2025 FureverHome · Made with ❤️ for every pet in need.</p>
-</footer>
 
 </body>
 </html>
