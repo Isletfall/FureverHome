@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>宠物详情 - FUREVERHOME</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined" rel="stylesheet"/>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+    body {
+      font-family: 'Noto Sans SC', sans-serif;
+    }
+  </style>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#FB923C", // Orange from screenshot
+            "background-light": "#F8FAFC", // Light gray
+            "background-dark": "#18181B", // Dark Zinc
+          },
+          fontFamily: {
+            display: ["Noto Sans SC", "sans-serif"],
+          },
+          borderRadius: {
+            DEFAULT: "0.75rem", // 12px
+          },
+        },
+      },
+    };
+  </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-700 dark:text-slate-300">
+<div id="root">
+<header class="bg-primary shadow-md">
+<nav class="container mx-auto px-6 py-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center">
+<a class="text-white text-2xl font-bold flex items-center" href="#">
+<span class="material-icons-outlined mr-2 text-3xl">pets</span>
+<span>FUREVER HOME</span>
+</a>
+</div>
+<div class="flex items-center space-x-8">
+<a class="text-white hover:text-slate-200" href="#">首页</a>
+<a class="text-white font-bold border-b-2 border-white pb-1" href="#">宠物列表</a>
+<a class="text-white hover:text-slate-200" href="#">沟通对接</a>
+<a class="text-white hover:text-slate-200" href="#">宠物论坛</a>
+<a class="text-white hover:text-slate-200" href="#">个人主页</a>
+</div>
+<div class="flex items-center">
+<a class="text-white flex items-center" href="#">
+<span class="material-icons-outlined mr-2">account_circle</span>
+              用户
+            </a>
+</div>
+</div>
+</nav>
+</header>
+<main class="container mx-auto px-6 py-8">
+<div class="space-y-8">
+<div class="relative bg-white dark:bg-zinc-800 rounded-lg shadow-sm p-8">
+<a class="absolute top-8 right-8 flex items-center text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors" href="#">
+<span class="material-icons-outlined text-base mr-1">arrow_back_ios_new</span>
+<span>返回宠物列表</span>
+</a>
+<div class="flex space-x-8">
+<div class="w-1/3">
+<div class="bg-amber-100 rounded-lg aspect-[4/3] flex items-center justify-center">
+<p class="text-amber-600 dark:text-amber-400">小橘的照片</p>
+</div>
+</div>
+<div class="w-2/3 flex flex-col">
+<div class="flex-grow">
+<h1 class="text-4xl font-bold text-primary mb-2">小橘</h1>
+<p class="text-slate-500 dark:text-slate-400 mb-6">中华田园猫 · 橘猫</p>
+<div class="grid grid-cols-2 gap-x-8 gap-y-4 text-sm">
+<div class="border-b border-slate-200 dark:border-zinc-700 pb-3">
+<p class="text-slate-500 dark:text-slate-400">性别</p>
+<p class="font-medium text-slate-800 dark:text-slate-200 mt-1">公</p>
+</div>
+<div class="border-b border-slate-200 dark:border-zinc-700 pb-3">
+<p class="text-slate-500 dark:text-slate-400">年龄</p>
+<p class="font-medium text-slate-800 dark:text-slate-200 mt-1">1岁</p>
+</div>
+<div class="border-b border-slate-200 dark:border-zinc-700 pb-3">
+<p class="text-slate-500 dark:text-slate-400">健康状况</p>
+<p class="font-medium text-slate-800 dark:text-slate-200 mt-1">良好</p>
+</div>
+<div class="border-b border-slate-200 dark:border-zinc-700 pb-3">
+<p class="text-slate-500 dark:text-slate-400">性情特点</p>
+<p class="font-medium text-slate-800 dark:text-slate-200 mt-1">亲人、温顺</p>
+</div>
+<div>
+<p class="text-slate-500 dark:text-slate-400">目前位置</p>
+<p class="font-medium text-slate-800 dark:text-slate-200 mt-1">xx大学</p>
+</div>
+</div>
+</div>
+<div class="bg-amber-50 dark:bg-zinc-700/50 rounded-lg p-4 mt-6">
+<div class="flex items-center justify-between">
+<div>
+<span class="inline-block bg-amber-200 text-amber-800 dark:bg-amber-900 dark:text-amber-200 text-xs font-semibold px-2 py-1 rounded-full mb-2">短期领养</span>
+<p class="text-sm text-slate-600 dark:text-slate-300">当前领养状态：临时收养</p>
+<div class="flex items-center mt-3">
+<img alt="李同学的头像" class="h-10 w-10 rounded-full bg-slate-300 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBk-jit3EImykcXzDq2UdvC2M2VqX_Kp1o2la-V2-DBhvM9b2dSbpf4HB8MqvIdA0p8uO1ijOA3Lz4Ows8V0-6kmkRxsGYeNtI6-ba1Wx8q-oj5WwNkjZDDF_v6KOa8RjCc856ne2Fn-gMTcdcga85g1CrzvKiogTCgYiMLNxJ3K4u1zVaBZwbdVo_obCXZNmZJ8UGfKxrJsDLca8j1Odzefe5QpPZJL7jXsUpo-mU2SJt2Dy_T-m0ig_GxxjnlM4Nhk5zufdS6JD4"/>
+<div class="ml-3">
+<p class="font-semibold text-slate-800 dark:text-slate-200">李同学</p>
+<div class="flex items-center text-xs">
+<span class="text-slate-500 dark:text-slate-400 mr-1">评分: 4.9</span>
+<span class="text-amber-400">★★★★</span><span class="text-amber-300">★</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex items-center space-x-3">
+<button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">查看主页</button>
+<button class="bg-primary hover:bg-orange-500 text-white font-bold py-2 px-4 rounded-lg transition-colors">联系TA</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-zinc-800 rounded-lg shadow-sm p-8">
+<div class="space-y-8">
+<div>
+<h2 class="text-2xl font-bold text-primary mb-3">宠物简介</h2>
+<p class="leading-relaxed text-slate-600 dark:text-slate-300">小橘是一只非常亲人的橘猫，于2022年在xx大学被发现。性格活泼好动，喜欢与人互动，特别喜欢被挠下巴，已经完成绝育手术和所有必要疫苗，身体健康，无任何传染病史。</p>
+</div>
+<hr class="border-slate-200 dark:border-zinc-700"/>
+<div>
+<h2 class="text-2xl font-bold text-primary mb-3">关于小橘</h2>
+<p class="leading-relaxed text-slate-600 dark:text-slate-300">小橘是2022年秋天在xx大学被发现的流浪小猫，当时只有两个月大，被李同学救助并临时收养至今，已经健康成长为一只活泼可爱的猫咪。小橘性格异常温顺，喜欢与人互动，会主动蹭腿示好，特别喜欢玩逗猫棒和在线球，作息规律，已经学会使用猫砂盆，非常适合家庭培养。作为临时收养者，李同学已为小橘完成绝育、三联疫苗和体外驱虫，健康状况良好，希望能为小橘找到一个有爱心、负责任的长期家庭。</p>
+</div>
+<hr class="border-slate-200 dark:border-zinc-700"/>
+<div>
+<h2 class="text-2xl font-bold text-primary mb-4">生活照片</h2>
+<div class="grid grid-cols-4 gap-4">
+<div class="bg-slate-100 dark:bg-zinc-700 rounded-lg aspect-square flex items-center justify-center">
+<p class="text-slate-400 dark:text-slate-500 text-sm">照片1</p>
+</div>
+<div class="bg-slate-100 dark:bg-zinc-700 rounded-lg aspect-square flex items-center justify-center">
+<p class="text-slate-400 dark:text-slate-500 text-sm">照片2</p>
+</div>
+<div class="bg-slate-100 dark:bg-zinc-700 rounded-lg aspect-square flex items-center justify-center">
+<p class="text-slate-400 dark:text-slate-500 text-sm">照片3</p>
+</div>
+<div class="bg-slate-100 dark:bg-zinc-700 rounded-lg aspect-square flex items-center justify-center">
+<p class="text-slate-400 dark:text-slate-500 text-sm">照片4</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="bg-slate-800 dark:bg-zinc-900 text-slate-300 mt-12 py-10">
+<div class="container mx-auto px-6">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+<div>
+<h3 class="font-bold text-white text-lg mb-3">数据统计</h3>
+<p class="text-sm leading-relaxed">我们与多家救助站建立了长期合作关系，致力于为流浪动物提供更好的临时安置和长期领养服务。</p>
+<a class="text-sm text-primary hover:underline mt-2 inline-block" href="#">查看合作救助站 →</a>
+</div>
+<div>
+<h3 class="font-bold text-white text-lg mb-3">联系开发团队</h3>
+<p class="text-sm leading-relaxed">如果您有任何问题、建议或合作意向，请随时联系我们的开发团队。</p>
+<div class="flex justify-center md:justify-start space-x-4 mt-3">
+<img alt="WeChat icon" class="w-6 h-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdiq20XWM4wEAa1U7VImu-oT_qrN2LJNqEqWl7Af12-J-SE8Q-cpK8zWuyqfu10arPiqztW54nuEB0fkkSGpISGC8FUJxcniPQXhDOMXuhS5oDdBXw_6rFpworTA_4Nhd-zajp8kxLO1Ejqcqce6coFHgdZw08O6tGaF0fddzfRhl0Iz0UVnQRI0rovxKvJnncDezid7Bk0IzQsXhD6lZ7qLN3QOLYcmJ8QCssPL2zoyCifDhjNFid2NL52L2ekq-Qy-rggIh9u48"/>
+<img alt="QQ icon" class="w-6 h-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7vJjg-PIK8sll0udf37rKFwz3wykWXSRDUSSn5L-os1m_BV7-k1NcEzZEy1pVw06dOyp8j6Mxt84ewv3lydIrw_rXkILxnXLgCZuDVC4GXVJePcXSDqSCYJZ2c34UAmYVNQAq6oWAcBO1qGfJyubmL0fsLTQcLGoIkeh6_dwHxF28QOalmqYFUxLbOG2VPuv7bQRVGyLElIYp3InEJIFs8GyOcEz7ZLFUItfGRxN1ohmi7i4vlhXmAro0UNcrNAh6O75FRO73we0"/>
+<img alt="Weibo icon" class="w-6 h-6" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPZfoGMDWqQ3RLA9vV-WNIK3fqCEf5AGPyfulMtscxjqPf7_zb9jH5F1cyyHF2Vn1jfu41yHc9nNhj5RNsFsA3MtyTlNfc7UuerHmJx7cdiouuPJKmMjKMrcCKaIaaKl3AifOK64CBLq6NWy5hW_0sRfoMKioI6E1yONfXTNmEnu1aX9EXSIogKpOiKo4KGakw4Q6MF4YiM6DOaGTZaDBbNYzqIeG2yWcv2AUBdIAcUct1AIYWgLEoO0JUfNB45g_hOTCtWRlP0Rk"/>
+</div>
+</div>
+</div>
+<div class="border-t border-slate-700 dark:border-zinc-700 mt-8 pt-6 text-center text-sm text-slate-400">
+<p>2025 FUREVERHOME流浪动物领养平台 - 让每个生命都有温暖的家</p>
+</div>
+</div>
+</footer>
+</div>
+</body></html>
