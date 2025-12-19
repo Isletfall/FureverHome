@@ -27,11 +27,11 @@
               h-12 px-4 rounded text-stone-900 dark:text-white text-sm w-full pr-10"
               placeholder="请输入您的邮箱"
             />
-            <span
+            <!-- <span
               class="material-symbols-outlined text-[20px] text-stone-400 absolute right-3 top-1/2 -translate-y-1/2"
             >
               mail
-            </span>
+            </span> -->
           </div>
         </div>
 
@@ -64,7 +64,14 @@
         <!-- 密码 -->
         <div class="space-y-1">
           <label class="text-sm font-bold ml-1">设置密码</label>
-          <div class="relative">
+          <input
+            :type="showPassword1 ? 'text' : 'password'"
+            v-model="password"
+            class="form-input border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800
+            h-12 px-4 rounded text-stone-900 dark:text-white text-sm w-full pr-10"
+            placeholder="请输入您的密码"
+          />
+          <!-- <div class="relative">
             <input
               :type="showPassword1 ? 'text' : 'password'"
               v-model="password"
@@ -81,7 +88,7 @@
                 {{ showPassword1 ? 'visibility_off' : 'visibility' }}
               </span>
             </button>
-          </div>
+          </div> -->
         </div>
 
         <!-- 再次输入密码 -->
@@ -95,7 +102,7 @@
               h-12 px-4 rounded text-stone-900 dark:text-white text-sm w-full pr-10"
               placeholder="请再次输入您的密码"
             />
-            <button
+            <!-- <button
               type="button"
               @click="showPassword2 = !showPassword2"
               class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400"
@@ -103,7 +110,7 @@
               <span class="material-symbols-outlined text-[20px]">
                 {{ showPassword2 ? 'visibility_off' : 'visibility' }}
               </span>
-            </button>
+            </button> -->
           </div>
         </div>
 
